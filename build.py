@@ -669,18 +669,22 @@ def run_discover(api, cfg):
 
 UUID_KEY = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
 NAME_KEY = re.compile(r"[A-Za-z][A-Za-z0-9_]{0,31}")
+# Dict keys `shapes` may print besides a canonical uuid: a fixed vocabulary, so no user-typed key can reach the
+# output (an identifier-like key such as a person's name prints as <key>).
+SHAPE_KEYS = frozenset(("id", "uuid", "key", "name", "title", "label", "value", "answer", "text", "type",
+                        "url", "mimeType", "size", "questionId", "fieldId") + HIDDEN_NAMES)
 
 
 def shape(value, depth=0):
     """The structure of an answer. Every string, number and boolean is replaced by its type name; a dict
-    shows its keys (only when they look like a uuid or a plain identifier), a list its length.
+    shows its keys (only a canonical uuid or a word of SHAPE_KEYS; any other key is <key>), a list its length.
     No value can reach the output."""
     if isinstance(value, dict):
         if depth >= 6:
             return "dict"
         items = []
         for k, v in list(value.items())[:50]:
-            ks = k if isinstance(k, str) and (UUID_KEY.fullmatch(k) or NAME_KEY.fullmatch(k)) else "<key>"
+            ks = k if isinstance(k, str) and (UUID_KEY.fullmatch(k) or k in SHAPE_KEYS) else "<key>"
             items.append("%s: %s" % (ks, shape(v, depth + 1)))
         return "{" + ", ".join(items) + "}"
     if isinstance(value, list):
@@ -709,7 +713,9 @@ def run_shapes(api, cfg):
         for r in subs[0].get("responses") or []:
             qid = r.get("questionId")
             qt = types.get(qid)
-            qs = qid if qid in types and isinstance(qid, str) and re.fullmatch(r"[A-Za-z0-9_-]{1,64}", qid) else "<unknown>"
+            # a known question's id, or a canonical uuid (shape b: a hidden field's uuid); nothing else
+            qs = qid if isinstance(qid, str) and ((qid in types and re.fullmatch(r"[A-Za-z0-9_-]{1,64}", qid))
+                                                 or UUID_KEY.fullmatch(qid)) else "<unknown>"
             print("%s\t%s\t%s" % (qs, qt if isinstance(qt, str) and NAME_KEY.fullmatch(qt) else "<unknown>",
                                   shape(r.get("answer"))))
 

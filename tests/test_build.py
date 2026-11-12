@@ -1014,6 +1014,27 @@ class Shapes(unittest.TestCase):
         for m in marks:
             self.assertEqual(build.shape(m), type(m).__name__)
 
+    # MUTATION: print any identifier-like key again (NAME_KEY instead of SHAPE_KEYS): this test must fail.
+    def test_identifier_like_user_keys_are_not_printed(self):
+        v = {"Kwame_Mensah": "x", "MKkey": {"Amina": [{"Mama_Ngozi": 1}]}, "recipe": "Jo11of",
+             "3f2a1b4c-0000-4000-8000-123456789abc": [{"uuid": "u", "value": "v"}]}
+        out = build.shape(v)
+        for m in ("Kwame", "Mensah", "MKkey", "Amina", "Ngozi", "Jo11of"):
+            self.assertNotIn(m, out)
+        for k in ("recipe", "uuid", "value", "3f2a1b4c-0000-4000-8000-123456789abc"):
+            self.assertIn(k, out)
+        # through the command: a hidden-field dict carrying a user-like key prints <key>
+        w = fixturelib.World()
+        w.report("en", "Rid001")
+        for r in w.rep["en"].subs[-1]["responses"]:
+            if isinstance(r["answer"], dict):
+                r["answer"]["Kwame_Mensah"] = {"Amina": "MK_val"}
+        code, so, se, _ = run(w, argv_extra=["shapes"])
+        self.assertEqual(code, 0, se)
+        for m in ("Kwame", "Amina", "MK_val", "Rid001"):
+            self.assertNotIn(m, so + se)
+        self.assertIn("<key>", so)
+
     def test_shapes_command_prints_structure_only_and_first_submission_only(self):
         w = marked_world()
         w.recipe("en", "MARK_second", dish_name="MK_second_submission")
