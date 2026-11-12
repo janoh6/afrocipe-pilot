@@ -1,0 +1,90 @@
+name: build-and-deploy
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+# Least privilege by default; the jobs below add only what they need.
+permissions:
+  contents: read
+
+# One deploy at a time. A running deploy is never cancelled half way.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Run the tests
+        run: python3 -m unittest -v
+
+      - name: Fetch the live recipe list
+        # 404 is fine on the very first deploy. Any other failure is caught by deploy_guard.py below.
+        id: live
+        env:
+          # Where the site is served. Set the repository variable SITE_URL while the custom domain is not live yet.
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          base="${SITE_URL:-https://$(tr -d '[:space:]' < site/CNAME)}"
+          code=$(curl -s -o live-recipes.json -w '%{http_code}' --retry 3 --max-time 30 "${base%/}/data/recipes.json" || true)
+          echo "status=${code:-000}" >> "$GITHUB_OUTPUT"
+
+      - name: Build the site data
+        # Secrets are read from the environment only. The script prints counts and field names, never an answer.
+        # A missing secret fails this step, so nothing is deployed and the last good site stays up.
+        env:
+          TALLY_API_KEY: ${{ secrets.TALLY_API_KEY }}
+          DASHBOARD_PASSPHRASE: ${{ secrets.DASHBOARD_PASSPHRASE }}
+          ALLOW_EMPTY_FIRST_DEPLOY: ${{ vars.ALLOW_EMPTY_FIRST_DEPLOY }}
+          LIVE_STATUS: ${{ steps.live.outputs.status }}
+        run: |
+          if [ -z "$TALLY_API_KEY" ]; then
+            # An empty first deploy is allowed only while no recipes.json is live (404).
+            if python3 deploy_guard.py first-deploy --status "$LIVE_STATUS" --allow-empty-first-deploy "$ALLOW_EMPTY_FIRST_DEPLOY"; then
+              echo "No TALLY_API_KEY: building an empty recipe list for the first deploy."
+              python3 build.py --empty
+            else
+              echo "::error::Secret TALLY_API_KEY is not set. Not deploying. (For the very first deploy only, set the variable ALLOW_EMPTY_FIRST_DEPLOY to true.)"
+              exit 1
+            fi
+          elif [ -z "$DASHBOARD_PASSPHRASE" ]; then
+            echo "::error::Secret DASHBOARD_PASSPHRASE is not set. Not deploying."
+            exit 1
+          else
+            python3 build.py
+          fi
+
+      - name: Refuse to deploy a shrunken site
+        # The live list has recipes and this build has none: stop, unless ALLOW_EMPTY_DEPLOY is true.
+        env:
+          LIVE_STATUS: ${{ steps.live.outputs.status }}
+          ALLOW_EMPTY_DEPLOY: ${{ vars.ALLOW_EMPTY_DEPLOY }}
+        run: python3 deploy_guard.py shrink --status "$LIVE_STATUS" --live live-recipes.json --new site/data/recipes.json --allow-empty-deploy "$ALLOW_EMPTY_DEPLOY"
+
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

@@ -1,0 +1,277 @@
+{
+  "_comment": "Form ids and logical field -> question mapping. Each field: {id, title}. A set id (the Tally question uuid) is matched first; otherwise the exact title (whitespace-normalised). The ids come from the form drafts and are unverified against the REST API: run `python3 build.py discover` once a key exists. Choice answers are never matched by guessing: consent is the option uuid in the consent entry (optionally also option_text); contribution/overall use the configured option texts (an option uuid in an answer is first turned into its text); finished uses option positions.",
+  "target_tests": 5,
+  "submission_forms": {
+    "en": {
+      "id": "RWdKp4",
+      "fields": {
+        "consent": {
+          "id": "612764d9-cbd9-4c8e-ba84-9d213691673e",
+          "title": "Pilot website",
+          "option": "64b3eb85-0e0c-4329-bde0-cbc7fdb621e4"
+        },
+        "dish_name": {
+          "id": "34f64b53-e2e1-456f-9fa1-744935108bbc",
+          "title": "Name of the dish"
+        },
+        "other_names": {
+          "id": "b94f9229-3a32-4e29-92bc-615a5fa02514",
+          "title": "Other names for this dish (optional)"
+        },
+        "pilot_dish": {
+          "id": "2cda8c01-f7c7-423c-8586-ba9e7ea39f4d",
+          "title": "Which dish from the pilot list is this?"
+        },
+        "makes": {
+          "id": "904f2f54-515c-449f-9566-a94ce9d95ac5",
+          "title": "How much does this recipe make?"
+        },
+        "ingredients": {
+          "id": "19136d2d-6aaf-4cc8-9719-42b7208ac6c7",
+          "title": "Ingredients"
+        },
+        "method": {
+          "id": "3ebf4fde-1448-466b-a4a8-feb116c2d5f2",
+          "title": "Method"
+        },
+        "signs": {
+          "id": "59a511b3-be80-457d-bbe1-d23e17cbd02c",
+          "title": "How do you know each stage is ready?"
+        },
+        "total_time": {
+          "id": "d56a1604-c258-4f28-b9b6-db5650210e51",
+          "title": "How long does it take from start to finish?"
+        },
+        "equipment": {
+          "id": "4c051e41-645f-4685-ae0b-96eb570b8797",
+          "title": "What equipment do you use?"
+        },
+        "finished_dish": {
+          "id": "57b1008f-c4fc-4e61-9b8f-8d06c547c4e6",
+          "title": "What should the finished dish look and taste like?"
+        }
+      }
+    },
+    "fr": {
+      "id": "VpQ1VJ",
+      "fields": {
+        "consent": {
+          "id": "f327d75f-1096-4e7b-9c38-1abac2840d1d",
+          "title": "Site du pilote",
+          "option": "ea1a1d7e-0c66-41d9-918c-f71d5e618924"
+        },
+        "dish_name": {
+          "id": "68eb0ab9-616c-472b-a655-12ea7b0a16a8",
+          "title": "Nom du plat"
+        },
+        "other_names": {
+          "id": "5f1edbab-0646-48f0-95c0-77c85466cc13",
+          "title": "Autres noms de ce plat (facultatif)"
+        },
+        "pilot_dish": {
+          "id": "50bff34b-ae3c-4271-892f-e108775a3ed8",
+          "title": "De quel plat de la liste du pilote s'agit-il ?"
+        },
+        "makes": {
+          "id": "503909b6-dfab-49f3-bcc1-9d892fa3429c",
+          "title": "Quelle quantité cette recette donne-t-elle ?"
+        },
+        "ingredients": {
+          "id": "c9ddd5c8-5578-4ffc-bbd9-694b69b459a6",
+          "title": "Ingrédients"
+        },
+        "method": {
+          "id": "220dc286-890b-4811-9ff8-85f6dc04b4e5",
+          "title": "Préparation"
+        },
+        "signs": {
+          "id": "c6a40ec5-8caf-42f1-9cc2-238dfaf7cba1",
+          "title": "Comment savez-vous que chaque étape est prête ?"
+        },
+        "total_time": {
+          "id": "002d8bf4-0451-44e3-b88b-72be4706d06d",
+          "title": "Combien de temps faut-il du début à la fin ?"
+        },
+        "equipment": {
+          "id": "4a117d4b-98f5-418e-a8ad-9f8fa981c266",
+          "title": "Quel matériel utilisez-vous ?"
+        },
+        "finished_dish": {
+          "id": "53e397e5-a9fd-4200-8cca-ccb6bde42413",
+          "title": "À quoi le plat fini doit-il ressembler, et quel goût doit-il avoir ?"
+        }
+      }
+    },
+    "sw": {
+      "id": "Ge9BVL",
+      "fields": {
+        "consent": {
+          "id": "fab6d063-c5af-4aa2-a1c2-28e917e514e6",
+          "title": "Tovuti ya majaribio",
+          "option": "aa28b4d8-93f7-4fb8-8a53-bc22beb592c3"
+        },
+        "dish_name": {
+          "id": "e7487df1-9e53-4dff-adcc-ec33c8beebca",
+          "title": "Jina la chakula"
+        },
+        "other_names": {
+          "id": "5a3794f8-9235-40ec-9510-3726b93d7b30",
+          "title": "Majina mengine ya chakula hiki (si lazima)"
+        },
+        "pilot_dish": {
+          "id": "af152963-2713-4822-840d-61fad4a71bb6",
+          "title": "Hiki ni chakula kipi kwenye orodha ya majaribio?"
+        },
+        "makes": {
+          "id": "0d937b0e-fbc5-485b-b73a-ae3c6af40f84",
+          "title": "Resipi hii inatoa kiasi gani?"
+        },
+        "ingredients": {
+          "id": "803219fd-6554-44ac-b737-25a14aef42d2",
+          "title": "Viambato"
+        },
+        "method": {
+          "id": "9b0bbf00-59d0-4e1d-b13e-8b1aff59e80a",
+          "title": "Jinsi ya kupika"
+        },
+        "signs": {
+          "id": "ccb624d9-325e-4ead-8625-97f411746d47",
+          "title": "Unajuaje kila hatua iko tayari?"
+        },
+        "total_time": {
+          "id": "c9a3dd2b-2e60-44b1-b350-21a3dbce515b",
+          "title": "Inachukua muda gani kuanzia mwanzo hadi mwisho?"
+        },
+        "equipment": {
+          "id": "5c77dc93-ed46-4101-8996-f161262e39d8",
+          "title": "Unatumia vifaa gani?"
+        },
+        "finished_dish": {
+          "id": "ead298f8-a231-4c86-a58b-d9db506a37c5",
+          "title": "Chakula kilichokamilika kinapaswa kuonekana na kuonja vipi?"
+        }
+      }
+    }
+  },
+  "report_forms": {
+    "en": {
+      "id": "GeKvWe",
+      "fields": {
+        "recipe": {
+          "id": "4c6e6c00-f18c-4b06-b115-9188529caa2c",
+          "title": "recipe"
+        },
+        "dish": {
+          "id": "ee145a89-41c1-400d-8ff4-5e47fab7e51f",
+          "title": "dish",
+          "optional": true
+        },
+        "version": {
+          "id": "abe97641-2846-49a0-9138-5ecdab086f1e",
+          "title": "version",
+          "optional": true
+        },
+        "contribution": {
+          "id": "9d76c5d6-1b44-4697-8270-88970663a780",
+          "title": "Did you write this recipe or contribute to it?",
+          "yes": "Yes",
+          "no": "No"
+        },
+        "finished": {
+          "id": "6f4e812b-abc5-4fae-9df2-10bfa0392822",
+          "title": "Did you finish the dish?",
+          "finished_index": 0,
+          "stopped_index": 1
+        },
+        "overall": {
+          "id": "431553d5-0503-4727-8162-737592cd0e5f",
+          "title": "Overall, did you make the dish the recipe describes?",
+          "made": "Yes, I made the dish the recipe describes",
+          "not_made": "No, the result was a different dish or it failed",
+          "cannot_tell": "I cannot tell"
+        }
+      }
+    },
+    "fr": {
+      "id": "PR1Bl5",
+      "fields": {
+        "recipe": {
+          "id": "aa616388-9651-43f4-8aa7-8bd1cf9c9ae7",
+          "title": "recipe"
+        },
+        "dish": {
+          "id": "d57e3d25-9535-44a8-a17d-59eadc967128",
+          "title": "dish",
+          "optional": true
+        },
+        "version": {
+          "id": "a4bab046-a071-4994-9555-8358ef153713",
+          "title": "version",
+          "optional": true
+        },
+        "contribution": {
+          "id": "01f2fe5f-d5be-457c-b9c1-53ccd30ce54d",
+          "title": "Avez-vous rédigé cette recette ou y avez-vous contribué ?",
+          "yes": "Oui",
+          "no": "Non"
+        },
+        "finished": {
+          "id": "50a71d22-279a-4c33-bbfb-2e45412c4d1f",
+          "title": "Avez-vous terminé le plat ?",
+          "finished_index": 0,
+          "stopped_index": 1
+        },
+        "overall": {
+          "id": "2749bbff-9913-4646-be3a-4eeef5e4a6fc",
+          "title": "Dans l'ensemble, avez-vous obtenu le plat que la recette décrit ?",
+          "made": "Oui, j'ai obtenu le plat que la recette décrit",
+          "not_made": "Non, le résultat était un autre plat ou il a raté",
+          "cannot_tell": "Je ne peux pas le dire"
+        }
+      }
+    },
+    "sw": {
+      "id": "RWMBQ4",
+      "fields": {
+        "recipe": {
+          "id": "b7d2e058-2533-4093-bb93-e756bbcd345a",
+          "title": "recipe"
+        },
+        "dish": {
+          "id": "1a987be3-a5ce-4776-8b7d-24dbc9832da1",
+          "title": "dish",
+          "optional": true
+        },
+        "version": {
+          "id": "fdd521dd-13bd-4b4f-bc9f-e985f5752bc4",
+          "title": "version",
+          "optional": true
+        },
+        "contribution": {
+          "id": "2752ac68-9451-4812-96c4-60aa19fe60f3",
+          "title": "Je, uliandika resipi hii au ulichangia?",
+          "yes": "Ndiyo",
+          "no": "Hapana"
+        },
+        "finished": {
+          "id": "1afcf0d1-1f6f-4971-98ca-3238e893d551",
+          "title": "Je, ulimaliza kupika chakula?",
+          "finished_index": 0,
+          "stopped_index": 1
+        },
+        "overall": {
+          "id": "3232811d-8463-418f-85dc-413606e71a9f",
+          "title": "Kwa ujumla, je, ulipata chakula ambacho resipi inakieleza?",
+          "made": "Ndiyo, nilipata chakula ambacho resipi inakieleza",
+          "not_made": "Hapana, matokeo yalikuwa chakula tofauti au kiliharibika",
+          "cannot_tell": "Siwezi kusema"
+        }
+      }
+    }
+  },
+  "signup_forms": {
+    "en": "QoeBd8",
+    "fr": "J1pkL4",
+    "sw": "OQ4BZY"
+  }
+}
