@@ -7,6 +7,7 @@ checkbox questions are assumptions (see README): choices are lists of option uui
 checkbox is `true`.
 """
 import copy
+import hashlib
 import json
 from pathlib import Path
 
@@ -39,8 +40,8 @@ OPTIONS = {
     "overall": ["Made it", "Did not", "Cannot tell"],
 }
 TYPES = {
-    "consent": "CHECKBOX", "pilot_dish": "DROPDOWN_OPTION", "recipe": "HIDDEN_FIELDS",
-    "dish": "HIDDEN_FIELDS", "version": "HIDDEN_FIELDS",
+    "consent": "CHECKBOX", "pilot_dish": "DROPDOWN_OPTION", "recipe": "HIDDEN_FIELD",
+    "dish": "HIDDEN_FIELD", "version": "HIDDEN_FIELD",
     "contribution": "MULTIPLE_CHOICE_OPTION", "finished": "MULTIPLE_CHOICE_OPTION",
     "overall": "MULTIPLE_CHOICE_OPTION",
     "other_names": "TEXTAREA", "ingredients": "TEXTAREA", "method": "TEXTAREA", "signs": "TEXTAREA",
@@ -54,31 +55,55 @@ def load_config():
 
 class Form:
     def __init__(self, form_id, defs, ids=None, options=None):
-        """defs: list of (key, type, title). Question ids: ids[key] when given, else q-<form>-<key>."""
+        """defs: list of (key, type, title). `ids[key]` is the form-builder uuid (kept in config.json); the
+        live API gives each question a SHORT id instead, used in answers. A def of type HIDDEN_FIELD is one
+        field of the form's single HIDDEN_FIELDS question (title null, uuid = ids[key]).
+        hidden_shape picks how hidden answers are written: "a" dict by field uuid, "a_name" dict by field
+        name, "b" one response per field keyed by the field uuid, "c" list of dicts."""
         self.id = form_id
         self.ids = ids or {}
+        self.hidden_shape = "a"
         self.defs = list(defs)
         self.options = dict(OPTIONS, **(options or {}))
         self.subs = []
         self.n = 0
 
+    def uuid(self, key):
+        return self.ids.get(key) or "u-%s-%s" % (self.id, key)
+
     def qid(self, key):
-        return self.ids.get(key) or "q-%s-%s" % (self.id, key)
+        """The short question id the API reports (stable per key, 6 characters like Tally's)."""
+        h = hashlib.sha256(("%s/%s" % (self.id, key)).encode()).hexdigest()
+        return h[:6]
+
+    def hidden_qid(self):
+        return "hid" + hashlib.sha256(self.id.encode()).hexdigest()[:3]
 
     def opt(self, key, i):
         return "o-%s-%s-%d" % (self.id, key, i)
 
     def questions(self):
-        out = []
+        out, hidden = [], []
         for key, typ, title in self.defs:
+            if typ == "HIDDEN_FIELD":
+                hidden.append({"uuid": self.uuid(key), "type": "HIDDEN_FIELD",
+                               "questionType": "HIDDEN_FIELDS", "blockGroupUuid": self.hidden_qid(), "title": title})
+                continue
             q = {"id": self.qid(key), "type": typ, "title": title, "isDeleted": False, "fields": []}
             if key in self.options and typ in ("MULTIPLE_CHOICE_OPTION", "DROPDOWN_OPTION"):
-                q["fields"] = [{"uuid": self.opt(key, i), "type": typ, "blockGroupUuid": self.qid(key), "title": t}
+                q["fields"] = [{"uuid": self.opt(key, i), "type": typ, "blockGroupUuid": self.uuid(key), "title": t}
                                for i, t in enumerate(self.options[key])]
             elif typ == "CHECKBOX":
                 q["fields"] = [{"uuid": "c-%s-%s" % (self.id, key), "type": "CHECKBOX",
-                                "blockGroupUuid": self.qid(key), "title": "I agree"}]
+                                "blockGroupUuid": self.uuid(key), "title": "I agree"}]
+            elif typ != "HIDDEN_FIELDS":
+                # an ordinary question: ONE field whose uuid and blockGroupUuid are the form-builder uuid
+                q["fields"] = [{"uuid": self.uuid(key), "type": "INPUT_FIELD", "questionType": typ,
+                                "blockGroupUuid": self.uuid(key), "title": title}]
             out.append(q)
+        if hidden:
+            out.append({"id": self.hidden_qid(), "type": "HIDDEN_FIELDS", "title": None, "isDeleted": False,
+                        "fields": hidden})
         return out
 
     def blocks(self):
@@ -86,7 +111,7 @@ class Form:
         for key, typ, _ in self.defs:
             if key in self.options and typ in ("MULTIPLE_CHOICE_OPTION", "DROPDOWN_OPTION"):
                 for i, t in enumerate(self.options[key]):
-                    out.append({"type": typ, "uuid": self.opt(key, i), "groupUuid": self.qid(key),
+                    out.append({"type": typ, "uuid": self.opt(key, i), "groupUuid": self.uuid(key),
                                 "payload": {"index": i, "text": t}})
         return out
 
@@ -94,14 +119,33 @@ class Form:
         """answers: {key: python value}; choice keys take an option index."""
         self.n += 1
         sid = sid or "s%05d" % self.n
-        responses = []
+        responses, hidden = [], []
         for key, val in answers.items():
             typ = next((t for k, t, _ in self.defs if k == key), None)
             if typ is None:
                 continue          # question removed from this form
+            if typ == "HIDDEN_FIELD":
+                hidden.append((key, val))
+                continue
             if key in self.options and typ in ("MULTIPLE_CHOICE_OPTION", "DROPDOWN_OPTION") and isinstance(val, int):
                 val = [self.opt(key, val)]
             responses.append({"id": "r-%s-%s" % (sid, key), "questionId": self.qid(key), "answer": val})
+        if hidden:
+            hs, hq = self.hidden_shape, self.hidden_qid()
+            title = {k: next(t for kk, _, t in self.defs if kk == k) for k, _ in hidden}
+            rid = "r-%s-hidden" % sid
+            if hs == "a":
+                responses.append({"id": rid, "questionId": hq, "answer": {self.uuid(k): v for k, v in hidden}})
+            elif hs == "a_name":
+                responses.append({"id": rid, "questionId": hq, "answer": {title[k]: v for k, v in hidden}})
+            elif hs == "b":
+                for k, v in hidden:
+                    responses.append({"id": rid + k, "questionId": self.uuid(k), "answer": v})
+            elif hs == "c":
+                responses.append({"id": rid, "questionId": hq, "answer": [
+                    {"uuid": self.uuid(k), "title": title[k], "value": v} for k, v in hidden]})
+            else:
+                raise ValueError(hs)
         self.subs.append({"id": sid, "formId": self.id, "isCompleted": completed,
                           "submittedAt": submitted + "T09:30:00.000Z", "locale": None, "responses": responses})
         return sid

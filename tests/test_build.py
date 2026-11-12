@@ -818,6 +818,229 @@ class DeployGuard(unittest.TestCase):
         self.assertEqual(cli("first-deploy", "--status", "404"), 1)
 
 
+class RealApiStructure(unittest.TestCase):
+    """Short question ids, one field per question, one HIDDEN_FIELDS question (the structure the live API returns)."""
+
+    def _tests_for(self, w, cfg=None):
+        code, so, se, out = run(w, cfg=cfg)
+        self.assertEqual(code, 0, se)
+        return {r["id"]: r["tests"] for r in recipes_of(out)}
+
+    def test_fixtures_have_the_real_structure(self):
+        f = fixturelib.World().rep["en"]
+        qs = {q["id"]: q for q in f.questions()}
+        self.assertNotIn(f.uuid("contribution"), qs)                      # question ids are short ids
+        q = qs[f.qid("contribution")]
+        self.assertEqual(q["fields"][0]["blockGroupUuid"], f.uuid("contribution"))
+        hq = [q for q in qs.values() if q["type"] == "HIDDEN_FIELDS"]
+        self.assertEqual(len(hq), 1)
+        self.assertIsNone(hq[0]["title"])
+        self.assertEqual({x["title"] for x in hq[0]["fields"]}, {"recipe", "dish", "version"})
+
+    def test_question_matched_by_block_group_uuid_not_title(self):
+        w = fixturelib.World()
+        w.recipe("en", "bgu001", dish_name="By group uuid")
+        cfg = copy.deepcopy(w.cfg)
+        cfg["submission_forms"]["en"]["fields"]["dish_name"]["title"] = "No such title"
+        code, _, se, out = run(w, cfg=cfg)
+        self.assertEqual(code, 0, se)
+        self.assertEqual(recipes_of(out)[0]["dish_name"], "By group uuid")
+
+    def test_question_matched_by_field_uuid_when_group_uuid_differs(self):
+        w = fixturelib.World()
+        w.recipe("en", "fu0001", dish_name="By field uuid")
+        f = w.sub["en"]
+        orig = f.questions
+        def q():
+            qs = orig()
+            for x in qs:
+                for fld in x["fields"]:
+                    fld["blockGroupUuid"] = "something-else"
+            return qs
+        f.questions = q
+        cfg = copy.deepcopy(w.cfg)
+        cfg["submission_forms"]["en"]["fields"]["dish_name"]["title"] = "No such title"
+        code, _, se, out = run(w, cfg=cfg)
+        self.assertEqual(code, 0, se)
+        self.assertEqual(recipes_of(out)[0]["dish_name"], "By field uuid")
+
+    def test_id_matching_two_questions_fails_closed(self):
+        w = fixturelib.World()
+        w.recipe("en", "amb001")
+        f = w.sub["en"]
+        orig = f.questions
+        def q():
+            qs = orig()
+            for x in qs:
+                if x["title"] == "Your full name":      # a personal question claims the method's uuid
+                    x["fields"][0]["blockGroupUuid"] = f.uuid("method")
+            return qs
+        f.questions = q
+        code, so, se, out = run(w)
+        self.assertNotEqual(code, 0)
+        self.assertIn("method", se)
+        self.assertFalse((out / "recipes.json").exists())
+
+    def test_title_fallback_must_still_be_unique(self):
+        w = fixturelib.World()
+        w.sub["en"].defs.insert(0, ("evil", "INPUT_TEXT", "Method"))
+        w.recipe("en", "dup002", evil="MK_name")
+        cfg = copy.deepcopy(w.cfg)
+        cfg["submission_forms"]["en"]["fields"]["method"]["id"] = "stale-id"
+        code, so, se, out = run(w, cfg=cfg)
+        self.assertNotEqual(code, 0)
+        self.assertNotIn("MK_name", so + se)
+        self.assertFalse((out / "recipes.json").exists())
+
+    def test_hidden_field_by_uuid_or_by_title(self):
+        for mode in ("uuid", "title"):
+            w = fixturelib.World()
+            w.recipe("en", "hu0001")
+            w.report("en", "hu0001")
+            cfg = copy.deepcopy(w.cfg)
+            c = cfg["report_forms"]["en"]["fields"]["recipe"]
+            if mode == "uuid":
+                c["title"] = "no such name"
+            else:
+                c["id"] = "stale-uuid"
+            self.assertEqual(self._tests_for(w, cfg), {"hu0001": 1}, mode)
+
+    def test_required_hidden_field_missing_fails_naming_it(self):
+        w = fixturelib.World()
+        w.rep["en"].drop("recipe")
+        code, so, se, out = run(w)
+        self.assertNotEqual(code, 0)
+        self.assertIn("recipe", se)
+        self.assertFalse(out.exists() and any(out.iterdir()))
+
+    def test_hidden_field_matches_only_the_hidden_question(self):
+        # an ordinary question titled "recipe" must not satisfy the hidden field
+        w = fixturelib.World()
+        w.rep["en"].drop("recipe")
+        w.rep["en"].defs.append(("rq", "INPUT_TEXT", "recipe"))
+        code, so, se, out = run(w)
+        self.assertNotEqual(code, 0)
+        self.assertIn("recipe", se)
+
+    def test_two_hidden_fields_with_one_name_fails_closed(self):
+        w = fixturelib.World()
+        w.rep["en"].defs.append(("recipe2", "HIDDEN_FIELD", "recipe"))
+        cfg = copy.deepcopy(w.cfg)
+        cfg["report_forms"]["en"]["fields"]["recipe"]["id"] = "stale-uuid"
+        code, so, se, out = run(w, cfg=cfg)
+        self.assertNotEqual(code, 0)
+        self.assertIn("recipe", se)
+
+
+class HiddenAnswerShapes(unittest.TestCase):
+    """The shape of a hidden-field answer is unverified; three shapes are accepted, and anything else is not counted."""
+
+    def counts(self, shape, rid="hs0001", mutate=None):
+        w = fixturelib.World()
+        w.recipe("en", "hs0001")
+        w.rep["en"].hidden_shape = shape
+        w.report("en", rid)
+        if mutate:
+            mutate(w)
+        code, so, se, out = run(w)
+        self.assertEqual(code, 0, se)
+        if len(str(rid)) > 3:
+            self.assertNotIn(str(rid), so + se)
+        return recipes_of(out)[0]["tests"]
+
+    def test_shape_a_dict_by_field_uuid(self):
+        self.assertEqual(self.counts("a"), 1)
+
+    def test_shape_a_dict_by_field_name(self):
+        self.assertEqual(self.counts("a_name"), 1)
+
+    def test_shape_b_response_per_field_uuid(self):
+        self.assertEqual(self.counts("b"), 1)
+
+    def test_shape_c_list_of_named_values(self):
+        self.assertEqual(self.counts("c"), 1)
+
+    def test_shape_c_other_naming_keys_and_answer_key(self):
+        def mutate(w):
+            for sub in w.rep["en"].subs:
+                for r in sub["responses"]:
+                    if isinstance(r["answer"], list) and r["answer"] and isinstance(r["answer"][0], dict):
+                        r["answer"] = [{"name": it["title"], "answer": it["value"]} for it in r["answer"]]
+        self.assertEqual(self.counts("c", mutate=mutate), 1)
+
+    def test_bad_values_are_not_counted_fail_closed(self):
+        for shape in ("a", "a_name", "b", "c"):
+            for bad in ("x" * 65, "has space", "semi;colon", "new\nline", "ok\n", "", "<b>", "é1", 12345, True, None,
+                        ["hs0001"], {"v": "hs0001"}):
+                self.assertEqual(self.counts(shape, rid=bad), 0, (shape, bad))
+
+    def test_boundary_lengths(self):
+        w = fixturelib.World()
+        long_ok = "A" * 64
+        w.recipe("en", long_ok)
+        w.report("en", long_ok)
+        code, _, se, out = run(w)
+        self.assertEqual(recipes_of(out)[0]["tests"], 1)
+
+    def test_unrelated_response_is_not_a_hidden_value(self):
+        # a text answer to another question holding the recipe id must not be read as the hidden field
+        w = fixturelib.World()
+        w.recipe("en", "hs0001")
+        w.rep["en"].drop("recipe")
+        w.rep["en"].defs.append(("rq", "INPUT_TEXT", "Something else"))
+        cfg = copy.deepcopy(w.cfg)
+        cfg["report_forms"]["en"]["fields"]["recipe"]["optional"] = True
+        code, so, se, out = run(w)
+        self.assertNotEqual(code, 0)               # the required hidden field is missing: the build stops
+
+    def test_answer_for_another_hidden_field_is_not_the_recipe(self):
+        w = fixturelib.World()
+        w.recipe("en", "hs0001")
+        w.report("en", "other01", dish="hs0001", version="hs0001")
+        code, so, se, out = run(w)
+        self.assertEqual(recipes_of(out)[0]["tests"], 0)
+
+
+class Shapes(unittest.TestCase):
+    def test_shape_function_never_returns_a_value(self):
+        marks = ["MK_str", 4242424, 3.14159, True]
+        v = {"MK_key value": "MK_str", "a-b": [["MK_str", 4242424], {"deep": True, "3f2a1b4c-0000-4000-8000-123456789abc": 3.14159}]}
+        out = build.shape(v)
+        for m in ("MK_str", "4242424", "3.14159", "True", "MK_key", "value"):
+            self.assertNotIn(m, out)
+        self.assertIn("3f2a1b4c-0000-4000-8000-123456789abc", out)
+        self.assertIn("str", out)
+        self.assertIn("<key>", out)
+        for m in marks:
+            self.assertEqual(build.shape(m), type(m).__name__)
+
+    def test_shapes_command_prints_structure_only_and_first_submission_only(self):
+        w = marked_world()
+        w.recipe("en", "MARK_second", dish_name="MK_second_submission")
+        w.report("en", "MK_report_id", city="MK_city", describe="MK_describe")
+        w.report("en", "MK_report_second")
+        w.rep["en"].hidden_shape = "c"
+        w.report("en", "MK_hidden_c")
+        w.signups("en", 2)
+        code, so, se, out = run(w, argv_extra=["shapes"])
+        self.assertEqual(code, 0, se)
+        for m in ALLOWED_MARKERS + FORBIDDEN_MARKERS + ["Mark01", "MARK_second", "MK_second_submission", "MK_report_id",
+                                                         "MK_report_second", "MK_hidden_c", "MK_city", "MK_describe",
+                                                         "writer@example.org", "tester@example.org", "Writer Name",
+                                                         "signup@example.org", "Signup Name", PASS]:
+            self.assertNotIn(m, so + se, m)
+        self.assertIn("== submission en", so)
+        self.assertIn("str", so)
+        self.assertIn(w.sub["en"].qid("dish_name"), so)
+        self.assertIn(w.rep["en"].uuid("recipe"), so)             # a uuid key is structure
+        self.assertFalse(out.exists())                            # writes nothing
+
+    def test_shapes_for_a_form_without_submissions(self):
+        code, so, se, out = run(fixturelib.World(), argv_extra=["shapes"])
+        self.assertEqual(code, 0, se)
+        self.assertEqual(so.count("no completed submission"), 9)
+
+
 class TempDirs(unittest.TestCase):
     # MUTATION: go back to tempfile.mkdtemp() in the helpers: the leftover directory fails this test.
     def test_tests_leave_no_temporary_directories_behind(self):

@@ -13,6 +13,7 @@ Usage:
   python3 build.py --fixtures tests/fixtures
   python3 build.py --empty            # empty recipe list, no dashboard (first deploy)
   TALLY_API_KEY=... python3 build.py discover
+  TALLY_API_KEY=... python3 build.py shapes   # answer structure of each form's first submission, no values
 """
 import argparse
 import datetime
@@ -184,8 +185,11 @@ def derive_questions(blocks):
             title = "".join(part[0] for part in p.get("safeHTMLSchema", [])
                             if isinstance(part, list) and part and isinstance(part[0], str))
         elif t == "HIDDEN_FIELDS":
-            for h in p.get("hiddenFields", []):
-                out.append({"id": h.get("uuid"), "type": "HIDDEN_FIELDS", "title": h.get("name"), "fields": []})
+            hf = [h for h in p.get("hiddenFields", []) if h.get("uuid")]
+            gid = b.get("groupUuid") or b.get("uuid") or "hidden"
+            out.append({"id": gid, "type": "HIDDEN_FIELDS", "title": None,
+                        "fields": [{"uuid": h.get("uuid"), "type": "HIDDEN_FIELD", "blockGroupUuid": gid,
+                                    "title": h.get("name")} for h in hf]})
         elif t in ("INPUT_TEXT", "TEXTAREA", "INPUT_EMAIL", "INPUT_NUMBER", "INPUT_LINK", "INPUT_PHONE_NUMBER",
                    "INPUT_DATE", "INPUT_TIME", "LINEAR_SCALE", "RATING", "FILE_UPLOAD", "CHECKBOX",
                    "MULTIPLE_CHOICE_OPTION", "DROPDOWN_OPTION", "MULTI_SELECT_OPTION", "RANKING_OPTION"):
@@ -237,20 +241,88 @@ class FormData:
     def find(self, cfg):
         """Question matching a config entry: by id when one is set, else exact title.
 
+        An id matches a question's own id, or the uuid / blockGroupUuid of one of its fields (the
+        live API gives questions short ids, and the form-builder uuid sits on the field). A field
+        of the HIDDEN_FIELDS question never matches an id here: hidden fields have find_hidden.
+        An id that matches more than one question is ambiguous and fatal.
+
         A title fallback must match exactly one question. Two questions sharing a title (or a
         hidden field named like a question) would otherwise let the first one win, and that
         could be a personal question. Raises AmbiguousTitle, which the caller makes fatal."""
         qid, title = cfg.get("id"), norm(cfg.get("title"))
         if qid:
-            for q in self.questions:
-                if q.get("id") == qid:
-                    return q
+            hits = [q for q in self.questions if q.get("id") == qid or (
+                q.get("type") != "HIDDEN_FIELDS" and any(qid in (f.get("uuid"), f.get("blockGroupUuid"))
+                                                         for f in q.get("fields") or []))]
+            if len(hits) > 1:
+                raise AmbiguousTitle()
+            if hits:
+                return hits[0]
         if title:
             hits = [q for q in self.questions if norm(q.get("title")) == title]
             if len(hits) > 1:
                 raise AmbiguousTitle()
             if hits:
                 return hits[0]
+        return None
+
+    def find_hidden(self, cfg):
+        """(question, field) of a hidden field: by field uuid first, then by exact unique field name.
+        Only fields of HIDDEN_FIELDS questions are considered. None when absent."""
+        fid, title = cfg.get("id"), norm(cfg.get("title"))
+        pairs = [(q, f) for q in self.questions if q.get("type") == "HIDDEN_FIELDS"
+                 for f in q.get("fields") or []]
+        if fid:
+            hits = [(q, f) for q, f in pairs if f.get("uuid") == fid]
+            if len(hits) > 1:
+                raise AmbiguousTitle()
+            if hits:
+                return hits[0]
+        if title:
+            hits = [(q, f) for q, f in pairs if norm(f.get("title")) == title]
+            if len(hits) > 1:
+                raise AmbiguousTitle()
+            if hits:
+                return hits[0]
+        return None
+
+    def hidden_value(self, sub, hq, field):
+        """The value of one hidden field in a submission, or None when it is absent or unusable.
+        The answer shape is unverified, so three shapes are tried in order:
+          (a) a response for the HIDDEN_FIELDS question, answer a dict keyed by field uuid or name;
+          (b) a response whose questionId is the field uuid;
+          (c) a response for the HIDDEN_FIELDS question, answer a list of dicts naming the field.
+        Only a string of 1-64 characters from [A-Za-z0-9_-] is used. Never logged."""
+        fu, fname = field.get("uuid"), norm(field.get("title"))
+        keys = [k for k in (fu, fname) if k]
+        responses = [r for r in sub.get("responses") or [] if isinstance(r, dict)]
+        found, got = False, None
+        for r in responses:
+            if r.get("questionId") == hq.get("id") and isinstance(r.get("answer"), dict):
+                for k in keys:
+                    if k in r["answer"]:
+                        found, got = True, r["answer"][k]
+                        break
+            if found:
+                break
+        if not found:
+            for r in responses:
+                if fu and r.get("questionId") == fu:
+                    found, got = True, r.get("answer")
+                    break
+        if not found:
+            for r in responses:
+                if r.get("questionId") == hq.get("id") and isinstance(r.get("answer"), list):
+                    for item in r["answer"]:
+                        if isinstance(item, dict) and any(item.get(n) in keys for n in
+                                                          ("uuid", "id", "title", "name", "key") if item.get(n)):
+                            found = True
+                            got = item.get("value", item.get("answer"))
+                            break
+                if found:
+                    break
+        if isinstance(got, str) and re.fullmatch(r"[A-Za-z0-9_-]{1,64}", got):
+            return got
         return None
 
     def raw_answers(self, sub, question):
@@ -383,12 +455,16 @@ def load_hidden(path):
     return ids
 
 
-def resolve_fields(form, fields_cfg, label):
-    """Map logical field -> question. A missing expected question is fatal."""
+HIDDEN_NAMES = ("recipe", "dish", "version")
+
+
+def resolve_fields(form, fields_cfg, label, hidden=()):
+    """Map logical field -> question (or, for names in `hidden`, (HIDDEN_FIELDS question, field)).
+    A missing expected question or required hidden field is fatal."""
     out, missing, ambiguous = {}, [], []
     for name, c in fields_cfg.items():
         try:
-            q = form.find(c)
+            q = form.find_hidden(c) if name in hidden else form.find(c)
         except AmbiguousTitle:
             ambiguous.append(name)
             continue
@@ -434,13 +510,13 @@ def count_reports(report_forms, cfg):
     for lang in LANGS:
         form = report_forms[lang]
         fcfg = cfg["report_forms"][lang]["fields"]
-        q = resolve_fields(form, fcfg, "report " + lang)
+        q = resolve_fields(form, fcfg, "report " + lang, hidden=HIDDEN_NAMES)
         for sub in form.submissions:
             if not contribution_counts(choice(form, sub, q["contribution"]), fcfg["contribution"]):
                 excluded += 1
                 continue
             per_lang[lang] += 1
-            rid = form.text(sub, q["recipe"]).strip()
+            rid = form.hidden_value(sub, *q["recipe"])
             if not rid:
                 continue
             counts[rid] = counts.get(rid, 0) + 1
@@ -591,9 +667,56 @@ def run_discover(api, cfg):
             print("%s\t%s\t%s" % (q.get("id"), q.get("type"), norm(q.get("title"))))
 
 
+UUID_KEY = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+NAME_KEY = re.compile(r"[A-Za-z][A-Za-z0-9_]{0,31}")
+
+
+def shape(value, depth=0):
+    """The structure of an answer. Every string, number and boolean is replaced by its type name; a dict
+    shows its keys (only when they look like a uuid or a plain identifier), a list its length.
+    No value can reach the output."""
+    if isinstance(value, dict):
+        if depth >= 6:
+            return "dict"
+        items = []
+        for k, v in list(value.items())[:50]:
+            ks = k if isinstance(k, str) and (UUID_KEY.fullmatch(k) or NAME_KEY.fullmatch(k)) else "<key>"
+            items.append("%s: %s" % (ks, shape(v, depth + 1)))
+        return "{" + ", ".join(items) + "}"
+    if isinstance(value, list):
+        if depth >= 6:
+            return "list[%d]" % len(value)
+        return "list[%d](%s)" % (len(value), ", ".join(shape(v, depth + 1) for v in value[:5]))
+    return type(value).__name__
+
+
+def run_shapes(api, cfg):
+    """For each form, the first completed submission only: per response, the question type and answer shape."""
+    forms = []
+    for group in ("submission_forms", "report_forms"):
+        for l in LANGS:
+            forms.append((group[:-6] + " " + l, cfg[group][l]["id"]))
+    for l in LANGS:
+        forms.append(("signup " + l, cfg["signup_forms"][l]))
+    for label, fid in forms:
+        data = api.get("/forms/%s/submissions" % fid, {"page": 1, "limit": 1, "filter": "completed"})
+        types = {q.get("id"): q.get("type") for q in data.get("questions") or []}
+        subs = [s for s in data.get("submissions") or [] if s.get("isCompleted", True)]
+        print("== %s (%s)" % (label, fid))
+        if not subs:
+            print("no completed submission")
+            continue
+        for r in subs[0].get("responses") or []:
+            qid = r.get("questionId")
+            qt = types.get(qid)
+            qs = qid if qid in types and isinstance(qid, str) and re.fullmatch(r"[A-Za-z0-9_-]{1,64}", qid) else "<unknown>"
+            print("%s\t%s\t%s" % (qs, qt if isinstance(qt, str) and NAME_KEY.fullmatch(qt) else "<unknown>",
+                                  shape(r.get("answer"))))
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Build the Afrocipe pilot site data.")
-    ap.add_argument("command", nargs="?", default="build", choices=["build", "discover"])
+    ap.add_argument("command", nargs="?", default="build", choices=["build", "discover", "shapes"])
     ap.add_argument("--fixtures", metavar="DIR", help="read JSON files from DIR instead of the network")
     ap.add_argument("--empty", action="store_true", help="write an empty recipe list and no dashboard")
     ap.add_argument("--config", default=str(ROOT / "config.json"))
@@ -620,6 +743,9 @@ def main(argv=None):
             passphrase = os.environ.get("DASHBOARD_PASSPHRASE", "")
         if args.command == "discover":
             run_discover(api, cfg)
+            return 0
+        if args.command == "shapes":
+            run_shapes(api, cfg)
             return 0
         if not passphrase:
             raise BuildError("DASHBOARD_PASSPHRASE is not set")
