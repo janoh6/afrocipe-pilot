@@ -931,6 +931,20 @@ class RealApiStructure(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertIn("recipe", se)
 
+    # MUTATION: drop the HIDDEN_FIELDS exclusion in FormData.find: the hidden (URL-supplied) value is published.
+    def test_published_field_id_never_matches_a_hidden_field(self):
+        w = fixturelib.World()
+        f = w.sub["en"]
+        f.defs.append(("hx", "HIDDEN_FIELD", "src"))
+        f.hidden_shape = "b"                                    # a response whose questionId is the field uuid
+        w.recipe("en", "hx0001", dish_name="Real dish", hx="MK_hidden")
+        cfg = copy.deepcopy(w.cfg)
+        cfg["submission_forms"]["en"]["fields"]["dish_name"]["id"] = f.uuid("hx")
+        code, so, se, out = run(w, cfg=cfg)
+        self.assertEqual(code, 0, se)
+        self.assertEqual(recipes_of(out)[0]["dish_name"], "Real dish")
+        self.assertNotIn("MK_hidden", all_output_text(out) + so + se)
+
 
 class HiddenAnswerShapes(unittest.TestCase):
     """The shape of a hidden-field answer is unverified; three shapes are accepted, and anything else is not counted."""
