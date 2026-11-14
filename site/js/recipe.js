@@ -31,18 +31,20 @@
 
   function render(r) {
     document.title = (r.dish_name || r.code) + " - " + t(lang, "site_name");
-    var art = el("article", lines(r.ingredients).length ? "sheet sheet-cols" : "sheet");
-    art.lang = r.lang;
+    var head = document.getElementById("sheet-head");
+    head.lang = r.lang;
     var top = el("p", "sheet-top");
     top.appendChild(el("span", "code", r.code));
     top.appendChild(document.createTextNode(" "));
     top.appendChild(el("span", "ver", t(lang, "version", { v: "v1" })));
     top.appendChild(document.createTextNode(" "));
     top.appendChild(el("span", "tag", LANG_NAMES[r.lang] || r.lang));
-    art.appendChild(top);
-    art.appendChild(el("h1", null, r.dish_name || r.code));
-    if (r.other_names) art.appendChild(el("p", "also", t(lang, "f_also") + ": " + r.other_names.replace(/\s*\n\s*/g, ", ")));
+    head.appendChild(top);
+    head.appendChild(el("h1", null, r.dish_name || r.code));
+    if (r.other_names) head.appendChild(el("p", "also", t(lang, "f_also") + ": " + r.other_names.replace(/\s*\n\s*/g, ", ")));
 
+    var art = el("article", lines(r.ingredients).length ? "sheet sheet-cols" : "sheet");
+    art.lang = r.lang;
     var dl = el("dl", "facts");
     [["f_makes", r.makes], ["f_time", r.total_time], ["f_equipment", r.equipment]].forEach(function (p) {
       if (!p[1]) return;

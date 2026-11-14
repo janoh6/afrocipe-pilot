@@ -10,6 +10,8 @@ const PASS = process.env.DASHBOARD_PASSPHRASE || "pilot-fixture";
 const pages = ["index.html", "recipes.html", "recipe.html?id=Jo11of", "dashboard.html", "guide-testers.html", "guide-writers.html", "about.html"];
 const problems = [];
 let checked = 0;
+const headers = {};
+const gapsSeen = {};
 const browser = await chromium.launch();
 for (const width of [360, 800, 1280, 1920]) {
   for (const lang of ["en", "fr", "sw"]) {
@@ -49,6 +51,22 @@ for (const width of [360, 800, 1280, 1920]) {
       if (width < 896 && navShown) problems.push(`${tag}: phone menu should start closed`);
       if (width < 896) { await page.click("#menu-toggle"); if (!(await page.locator("#site-nav").isVisible())) problems.push(`${tag}: menu button does not open the menu`); await page.click("#menu-toggle"); }
       if (width >= 896 && !navShown) problems.push(`${tag}: menu hidden on a wide screen`);
+      // Header: the logo, every menu link and the language switch sit at the same place on every page.
+      const hdr = await page.evaluate(() => [...document.querySelectorAll(".brand, .nav a, .langs, .menu-toggle")].filter((e) => e.offsetParent !== null)
+        .map((e) => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.width, r.height].map((n) => Math.round(n * 2) / 2).join(","); }).join(" | "));
+      const hk = `${lang} ${width}`;
+      if (!(hk in headers)) headers[hk] = [p, hdr];
+      else if (headers[hk][1] !== hdr) problems.push(`${tag}: header differs from ${headers[hk][0]}\n    ${headers[hk][1]}\n    ${hdr}`);
+      // Gaps: the space between the header and the first content, and between the last content and the footer, is the same on every page.
+      const gaps = await page.evaluate(() => {
+        const vis = [...document.querySelectorAll("main .wrap > *")].filter((e) => e.offsetParent !== null && e.getBoundingClientRect().height > 0);
+        const top = Math.min(...vis.map((e) => e.getBoundingClientRect().top)), bottom = Math.max(...vis.map((e) => e.getBoundingClientRect().bottom));
+        return [Math.round(top - document.querySelector(".site-header").getBoundingClientRect().bottom), Math.round(document.querySelector(".site-footer").getBoundingClientRect().top - bottom)].join(" / ");
+      });
+      if (!(width in gapsSeen)) gapsSeen[width] = [p, gaps];
+      else if (gapsSeen[width][1] !== gaps) problems.push(`${tag}: top / bottom gap ${gaps}, but ${gapsSeen[width][1]} on ${gapsSeen[width][0]}`);
+      const fr = await page.evaluate(() => { const w = document.querySelector(".footer-grid").getBoundingClientRect(), s = getComputedStyle(document.querySelector(".footer-grid")); const c = document.querySelector("#contact").getBoundingClientRect(); return Math.round(w.right - parseFloat(s.paddingRight) - c.right); });
+      if (width >= 640 && fr !== 0) problems.push(`${tag}: footer's last column stops ${fr}px short of the right gutter`);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
       if (overflow) problems.push(`${tag}: horizontal overflow`);
       const csp = await page.evaluate(() => window.__csp || []);
