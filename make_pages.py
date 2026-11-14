@@ -24,6 +24,13 @@ FORMS = {
     "signup": {"en": "QoeBd8", "fr": "J1pkL4", "sw": "OQ4BZY"},
 }
 PRINTABLE = ("guide-testers", "guide-writers")
+# The buttons in a page's title band: what the reader of that page came to do.
+ACTIONS = {
+    "submit": '<a class="btn" data-form="submit" href="https://tally.so/r/%(form)s" data-i18n="btn_share">Share a recipe</a>',
+    "test": '<a class="btn" href="recipes.html" data-i18n="btn_test">Test a recipe</a>',
+    "signup": '<a class="btn btn-quiet" data-form="signup" href="https://tally.so/r/%(form)s" data-i18n="link_join">Join as a tester</a>',
+}
+PAGE_ACTIONS = {"guide-testers": ("test", "signup"), "guide-writers": ("submit",)}
 CSP = ("default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; "
        "base-uri 'none'; form-action 'none'")
 
@@ -50,6 +57,15 @@ HEADER = """<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
 </header>"""
 
 FOOTER = """<footer class="site-footer no-print">
+  <div class="footer-cta">
+    <div class="wrap footer-cta-row">
+      <p class="footer-cta-title" data-i18n="cta_title">Take part in the pilot</p>
+      <p class="footer-cta-actions">
+        <a class="btn btn-gold" data-form="submit" href="https://tally.so/r/RWdKp4" data-i18n="btn_share">Share a recipe</a>
+        <a class="btn btn-line" href="recipes.html" data-i18n="btn_test">Test a recipe</a>
+      </p>
+    </div>
+  </div>
   <div class="wrap footer-grid">
     <div>
       <p class="footer-name">Afrocipe</p>
@@ -188,12 +204,14 @@ def render(md, lang):
 
 def page(name):
     blocks = []
-    tools = ('<p class="tools no-print"><button type="button" class="btn btn-quiet" data-print data-i18n="print_pdf">'
-             'Print or save as PDF</button></p>\n') if name in PRINTABLE else ""
+    printer = ('<button type="button" class="btn btn-quiet" data-print data-i18n="print_pdf">Print or save as PDF</button>'
+               if name in PRINTABLE else "")
     for lang in LANGS:
         md = (ROOT / "content" / ("%s.%s.md" % (name, lang))).read_text(encoding="utf-8")
         head, _, rest = md.partition("\n## ")          # the title and any introduction come before the first section
         intro = render(head, lang).replace("<p>", '<p class="lead">')
+        buttons = [ACTIONS[kind] % ({"form": FORMS[kind][lang]} if kind in FORMS else {}) for kind in PAGE_ACTIONS.get(name, ())]
+        tools = ('<p class="tools no-print">%s</p>\n' % "\n".join(buttons + [printer] if printer else buttons)) if buttons or printer else ""
         blocks.append('<article lang="%s" data-lang="%s">\n<header class="page-head"><div class="wrap">\n%s\n%s</div></header>\n'
                       '<div class="wrap section prose">\n%s\n</div>\n</article>'
                       % (lang, lang, intro, tools, render("## " + rest, lang)))

@@ -716,6 +716,17 @@ class Site(unittest.TestCase):
                 self.assertRegex(href, r"^(#main|[a-z-]+\.html|assets/[\w.]+|css/style\.css|mailto:afrocipe12@gmail\.com|"
                                        r"https://tally\.so/r/\w+)$", name)
 
+    def test_every_page_asks_the_reader_to_take_part(self):
+        import make_pages
+        for needle in ('data-form="submit"', 'href="recipes.html" data-i18n="btn_test"'):
+            self.assertIn(needle, make_pages.FOOTER)           # the footer is on every page (next test)
+        testers = (ROOT / "site" / "guide-testers.html").read_text(encoding="utf-8")
+        writers = (ROOT / "site" / "guide-writers.html").read_text(encoding="utf-8")
+        self.assertEqual(testers.count('<p class="tools no-print"><a class="btn" href="recipes.html"'), 3)
+        self.assertEqual(testers.count('class="btn btn-quiet" data-form="signup"'), 3)
+        for lang, form in make_pages.FORMS["submit"].items():
+            self.assertIn('<p class="tools no-print"><a class="btn" data-form="submit" href="https://tally.so/r/%s"' % form, writers, lang)
+
     def test_every_page_has_the_same_header_and_every_key_exists(self):
         import make_pages
         i18n = (ROOT / "site" / "js" / "i18n.js").read_text(encoding="utf-8")

@@ -91,6 +91,10 @@ small { font-size: .85rem; }
 .btn:focus-visible { outline-offset: 4px; box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--gold); }
 .btn-quiet { background: #fff; color: var(--forest); }
 .btn-quiet:hover { background: var(--tint); border-color: var(--forest); }
+.btn-gold { background: var(--gold); border-color: var(--gold); color: var(--forest); }
+.btn-gold:hover { background: #ffd04a; border-color: #ffd04a; }
+.btn-line { background: transparent; border-color: #fff; color: #fff; }
+.btn-line:hover { background: rgba(255, 255, 255, .12); border-color: #fff; }
 .btn-big { display: flex; width: 100%; padding: .95rem 1.25rem; font-size: 1.15rem; }
 
 /* Bands: the home hero, each page's title band, and the tinted "how it works" strip. */
@@ -107,7 +111,7 @@ small { font-size: .85rem; }
 .page-head .lead { margin: .75rem 0 0; }
 .page-head .crumb { margin: 0 0 1rem; }
 .page-head .also { margin: .5rem 0 0; }
-.tools { margin: var(--space) 0 0; }
+.tools { display: flex; flex-wrap: wrap; gap: .75rem; margin: var(--space) 0 0; }
 .section-title { font-size: clamp(1.3rem, 1.1rem + .8vw, 1.6rem); }
 
 .roles { display: grid; gap: var(--space); }
@@ -185,6 +189,11 @@ html[lang="sw"] [data-lang]:not([data-lang="sw"]) { display: none; }
 .site-footer a { color: #fff; }
 .site-footer p { margin: 0 0 .4rem; }
 .site-footer :focus-visible { outline-color: #fff; }
+.footer-cta { background: var(--forest-dark); }
+.footer-cta-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem 2rem; padding-top: var(--space); padding-bottom: var(--space); text-align: center; }
+.site-footer .footer-cta-title { margin: 0; font-size: 1.25rem; font-weight: 700; color: #fff; }
+.site-footer .footer-cta-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; margin: 0; }
+.site-footer .btn-gold { color: var(--forest); }
 .footer-grid { display: grid; gap: var(--space); padding-top: var(--band); padding-bottom: var(--space); text-align: center; }
 .footer-name { font-size: 1.25rem; font-weight: 700; color: #fff; }
 .footer-h { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--lime); }
@@ -209,6 +218,7 @@ html[lang="sw"] [data-lang]:not([data-lang="sw"]) { display: none; }
   .footer-grid { grid-template-columns: 1fr auto auto; column-gap: clamp(2rem, 8vw, 6rem); text-align: left; }
   .footer-grid > :last-child { text-align: right; }
   .footer-base { justify-content: space-between; text-align: left; }
+  .footer-cta-row { justify-content: space-between; text-align: left; }
   .facts { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
   .fact { grid-template-columns: 1fr; gap: .15rem; }
 }
