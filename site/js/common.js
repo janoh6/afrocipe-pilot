@@ -35,6 +35,16 @@
     var here = location.pathname.split("/").pop() || "index.html";
     var nav = document.querySelectorAll(".nav a");
     for (var k = 0; k < nav.length; k++) if (nav[k].getAttribute("href") === here) nav[k].setAttribute("aria-current", "page");
+    var head = document.querySelector('[data-lang="' + lang + '"] h1');
+    var key = document.body.getAttribute("data-title");
+    if (head) document.title = head.textContent + " - " + t(lang, "site_name");
+    else if (key) document.title = t(lang, key) + " - " + t(lang, "site_name");
+    var toggle = document.getElementById("menu-toggle");
+    var bar = document.querySelector(".site-header");
+    if (toggle && bar) toggle.addEventListener("click", function () {
+      var open = bar.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
     var pr = document.querySelectorAll("[data-print]");
     for (var q = 0; q < pr.length; q++) pr[q].addEventListener("click", function () { window.print(); });
     var mail = document.getElementById("contact");

@@ -20,7 +20,8 @@ Open http://localhost:8000. The fixture dashboard passphrase is `pilot-fixture`.
 
 ## Guides and the About page
 
-The text lives in `content/<page>.<lang>.md` (`guide-testers`, `guide-writers`, `about`; `en`, `fr`, `sw`). After
+Every page is written by `make_pages.py`, so all share one head, header and footer; the four pages with
+scripts take their `<main>` from `content/pages/<page>.html`. The guides' and About text lives in `content/<page>.<lang>.md` (`guide-testers`, `guide-writers`, `about`; `en`, `fr`, `sw`). After
 editing, run `python3 make_pages.py` and commit the regenerated `site/*.html` too; the tests fail if they differ.
 The mission and vision on the About page are the operator's words (2026-11-14); the French and Swahili are translations.
 

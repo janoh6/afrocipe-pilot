@@ -6,31 +6,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Guide for recipe writers - Afrocipe Pilot</title>
 <meta name="description" content="Help test African recipes. Share a recipe, or cook one and send a report.">
+<meta name="theme-color" content="#0B3D2E">
 <link rel="icon" href="assets/AFROCIPE_Glyph_Master_RGB.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/style.css">
+<script src="js/early.js"></script>
 </head>
 <body>
 <a class="skip" href="#main" data-i18n="skip">Skip to content</a>
 <header class="site-header no-print">
   <div class="wrap bar">
     <a class="brand" href="index.html">
-      <span class="logo"><img src="assets/AFROCIPE_Glyph_Master_RGB.svg" alt="" width="1000" height="593"></span>
-      <span class="brand-name" data-i18n="site_name">Afrocipe Pilot</span>
+      <img class="logo" src="assets/AFROCIPE_Glyph_Master_RGB.svg" alt="" width="1000" height="593">
+      <span class="brand-name">Afrocipe</span>
+      <span class="brand-tag" data-i18n="brand_tag">Pilot</span>
     </a>
-    <nav class="nav" aria-label="Main">
-      <a href="index.html" data-i18n="nav_home">Home</a>
-      <a href="recipes.html" data-i18n="nav_recipes">Recipes</a>
-      <a href="guide-testers.html" data-i18n="nav_testers">For testers</a>
-      <a href="guide-writers.html" data-i18n="nav_writers">For writers</a>
-      <a href="about.html" data-i18n="nav_about">About</a>
-    </nav>
     <div id="langswitch" class="langs" role="group"></div>
+    <button type="button" id="menu-toggle" class="menu-toggle" aria-controls="site-nav" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span><span class="menu-label" data-i18n="menu">Menu</span></button>
+    <nav id="site-nav" class="nav" aria-label="Main">
+      <ul>
+        <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+        <li><a href="recipes.html" data-i18n="nav_recipes">Recipes</a></li>
+        <li><a href="guide-testers.html" data-i18n="nav_testers">For testers</a></li>
+        <li><a href="guide-writers.html" data-i18n="nav_writers">For writers</a></li>
+        <li><a href="about.html" data-i18n="nav_about">About</a></li>
+      </ul>
+    </nav>
   </div>
 </header>
-<main id="main" class="wrap">
-<p class="tools no-print"><button type="button" class="btn btn-quiet" data-print data-i18n="print_pdf">Print or save as PDF</button></p>
-<article class="prose" lang="en" data-lang="en">
+<main id="main">
+<article lang="en" data-lang="en">
+<header class="page-head"><div class="wrap">
 <h1>A guide for recipe writers</h1>
+<p class="tools no-print"><button type="button" class="btn btn-quiet" data-print data-i18n="print_pdf">Print or save as PDF</button></p>
+</div></header>
+<div class="wrap section prose">
 <h2>How the pilot works</h2>
 <p>Afrocipe is exploring a simple question: can someone who has never cooked your version of a dish make it using only the written recipe?</p>
 <ol>
@@ -81,9 +90,14 @@
 <li><strong>Your agreement</strong> is on the first page of the form: you keep your recipe, we credit you or the person or community you name, and you can ask us to stop using it or to take it off the site at any time. On the pilot site, recipes are shown without names.</li>
 <li><strong>Questions:</strong> email <a href="mailto:afrocipe12@gmail.com">afrocipe12@gmail.com</a>.</li>
 </ul>
+</div>
 </article>
-<article class="prose" lang="fr" data-lang="fr">
+<article lang="fr" data-lang="fr">
+<header class="page-head"><div class="wrap">
 <h1>Guide des rédacteurs de recettes</h1>
+<p class="tools no-print"><button type="button" class="btn btn-quiet" data-print data-i18n="print_pdf">Print or save as PDF</button></p>
+</div></header>
+<div class="wrap section prose">
 <h2>Comment fonctionne le pilote</h2>
 <p>Afrocipe explore une question simple : une personne qui n'a jamais cuisiné votre version d'un plat peut-elle le réussir avec la seule recette écrite ?</p>
 <ol>
@@ -134,9 +148,14 @@
 <li><strong>Votre accord</strong> se trouve à la première page du formulaire : votre recette reste à vous, nous vous nommons ou nous nommons la personne ou la communauté que vous indiquez, et vous pouvez nous demander à tout moment d'arrêter de l'utiliser ou de la retirer du site. Sur le site du pilote, les recettes s'affichent sans nom.</li>
 <li><strong>Des questions :</strong> écrivez à <a href="mailto:afrocipe12@gmail.com">afrocipe12@gmail.com</a>.</li>
 </ul>
+</div>
 </article>
-<article class="prose" lang="sw" data-lang="sw">
+<article lang="sw" data-lang="sw">
+<header class="page-head"><div class="wrap">
 <h1>Mwongozo kwa waandishi wa resipi</h1>
+<p class="tools no-print"><button type="button" class="btn btn-quiet" data-print data-i18n="print_pdf">Print or save as PDF</button></p>
+</div></header>
+<div class="wrap section prose">
 <h2>Jinsi majaribio yanavyofanya kazi</h2>
 <p>Afrocipe inachunguza swali moja rahisi: je, mtu ambaye hajawahi kupika toleo lako la chakula anaweza kukipika kwa kutumia resipi iliyoandikwa pekee?</p>
 <ol>
@@ -187,12 +206,34 @@
 <li><strong>Makubaliano yako</strong> yako kwenye ukurasa wa kwanza wa fomu: resipi inabaki kuwa yako, tunakutaja wewe au mtu au jamii unayoitaja, na unaweza kutuomba tuache kuitumia au tuiondoe kwenye tovuti wakati wowote. Kwenye tovuti ya majaribio, resipi zinaonyeshwa bila majina.</li>
 <li><strong>Maswali:</strong> tuma barua pepe kwa <a href="mailto:afrocipe12@gmail.com">afrocipe12@gmail.com</a>.</li>
 </ul>
+</div>
 </article>
 </main>
 <footer class="site-footer no-print">
+  <div class="wrap footer-grid">
+    <div>
+      <p class="footer-name">Afrocipe</p>
+      <p data-i18n="footer_tagline">Help us test African recipes.</p>
+    </div>
+    <nav aria-label="Footer">
+      <p class="footer-h" data-i18n="footer_explore">Explore</p>
+      <ul>
+        <li><a href="recipes.html" data-i18n="nav_recipes">Recipes</a></li>
+        <li><a href="guide-testers.html" data-i18n="guide_testers">Guide for testers</a></li>
+        <li><a href="guide-writers.html" data-i18n="guide_writers">Guide for recipe writers</a></li>
+        <li><a href="about.html" data-i18n="home_about_link">More about Afrocipe</a></li>
+      </ul>
+    </nav>
+    <div>
+      <p class="footer-h" data-i18n="footer_contact">Questions? Write to</p>
+      <p><a id="contact" href="mailto:afrocipe12@gmail.com">afrocipe12@gmail.com</a></p>
+    </div>
+  </div>
   <div class="wrap">
-    <p><span data-i18n="footer_contact">Questions? Write to</span> <a id="contact" href="mailto:afrocipe12@gmail.com">afrocipe12@gmail.com</a></p>
-    <p class="fine" data-i18n="footer_note">A pilot by Afrocipe.</p>
+    <div class="footer-base">
+      <p><small data-i18n="footer_rights">&copy; 2026 Afrocipe. Recipes belong to their writers.</small></p>
+      <p><small data-i18n="footer_note">A pilot by Afrocipe.</small></p>
+    </div>
   </div>
 </footer>
 <script src="js/config.js"></script>

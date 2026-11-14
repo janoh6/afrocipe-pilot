@@ -1,4 +1,4 @@
-// Browser check: every page at 360 and 1280 px in en/fr/sw, with zero console errors, page errors,
+// Browser check: every page at 360, 800, 1280 and 1920 px in en/fr/sw, with zero console errors, page errors,
 // failed requests or CSP violations. Usage:
 //   python3 build.py --fixtures tests/fixtures && python3 -m http.server -d site 8765 &
 //   PLAYWRIGHT=<path to the playwright package> node tests/browser_check.mjs http://localhost:8765
@@ -11,7 +11,7 @@ const pages = ["index.html", "recipes.html", "recipe.html?id=Jo11of", "dashboard
 const problems = [];
 let checked = 0;
 const browser = await chromium.launch();
-for (const width of [360, 1280]) {
+for (const width of [360, 800, 1280, 1920]) {
   for (const lang of ["en", "fr", "sw"]) {
     const ctx = await browser.newContext({ viewport: { width, height: 800 } });
     for (const p of pages) {
@@ -34,10 +34,21 @@ for (const width of [360, 1280]) {
         if ((await page.locator("#out table").count()) !== 3) problems.push(`${tag}: expected 3 tables`);
       }
       if (/^(guide|about)/.test(p)) {
-        const shown = await page.locator("article.prose:visible").count();
-        const l = await page.locator("article.prose:visible").first().getAttribute("lang");
+        const shown = await page.locator("article[data-lang]:visible").count();
+        const l = await page.locator("article[data-lang]:visible").first().getAttribute("lang");
         if (shown !== 1 || l !== lang) problems.push(`${tag}: expected one ${lang} block, saw ${shown} (${l})`);
       }
+      // Gutters: every container on the page starts and ends at the same x, header and footer included.
+      const edges = await page.evaluate(() => [...document.querySelectorAll(".wrap")].filter((e) => e.offsetParent !== null)
+        .map((e) => { const r = e.getBoundingClientRect(); return Math.round(r.left) + ":" + Math.round(r.right); }));
+      if (new Set(edges).size !== 1) problems.push(`${tag}: containers do not share one gutter (${[...new Set(edges)].join(" ")})`);
+      // Footer: at or below the bottom of the window, never floating in the middle of a short page.
+      const foot = await page.evaluate(() => Math.round(document.querySelector(".site-footer").getBoundingClientRect().bottom + window.scrollY) >= window.innerHeight);
+      if (!foot) problems.push(`${tag}: footer is not at the bottom of the window`);
+      const navShown = await page.locator("#site-nav").isVisible();
+      if (width < 896 && navShown) problems.push(`${tag}: phone menu should start closed`);
+      if (width < 896) { await page.click("#menu-toggle"); if (!(await page.locator("#site-nav").isVisible())) problems.push(`${tag}: menu button does not open the menu`); await page.click("#menu-toggle"); }
+      if (width >= 896 && !navShown) problems.push(`${tag}: menu hidden on a wide screen`);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
       if (overflow) problems.push(`${tag}: horizontal overflow`);
       const csp = await page.evaluate(() => window.__csp || []);

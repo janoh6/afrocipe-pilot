@@ -1,0 +1,13 @@
+  <header class="page-head"><div class="wrap">
+    <h1 data-i18n="dash_title">Pilot dashboard</h1>
+    <p class="lead" data-i18n="dash_private">Private. Enter the passphrase to see the numbers. Nothing is sent anywhere.</p>
+  </div></header>
+  <div class="wrap section">
+    <form id="unlock" class="unlock">
+      <label for="pass" data-i18n="dash_pass">Passphrase</label>
+      <input id="pass" type="password" autocomplete="current-password" required>
+      <button class="btn" type="submit" data-i18n="dash_show">Show the numbers</button>
+    </form>
+    <p id="msg" role="alert" class="error"></p>
+    <div id="out"></div>
+  </div>

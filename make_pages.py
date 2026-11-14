@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Write the content pages (guides, about) from content/<page>.<lang>.md into site/<page>.html.
+"""Write every page of the site, so that all of them share one head, header and footer.
 
-Each page holds the three languages; css shows the one that matches <html lang>. The text is ours, not form
+Content pages (guides, about) come from content/<page>.<lang>.md; the other four take their <main> from
+content/pages/<page>.html. A content page holds the three languages; css shows the one that matches <html lang>. The text is ours, not form
 input, and is still escaped. Markdown subset: # and ## headings, paragraphs, "1." lists, "-" lists, "- [ ]" check
 lists, | tables | (first row is the header), **bold**, [text](target). A target is a site page, mailto:, or
 form:<kind> for a Tally form in the page language. A line "!notice" inserts the site's standard notice, and
@@ -30,29 +31,88 @@ HEADER = """<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
 <header class="site-header no-print">
   <div class="wrap bar">
     <a class="brand" href="index.html">
-      <span class="logo"><img src="assets/AFROCIPE_Glyph_Master_RGB.svg" alt="" width="1000" height="593"></span>
-      <span class="brand-name" data-i18n="site_name">Afrocipe Pilot</span>
+      <img class="logo" src="assets/AFROCIPE_Glyph_Master_RGB.svg" alt="" width="1000" height="593">
+      <span class="brand-name">Afrocipe</span>
+      <span class="brand-tag" data-i18n="brand_tag">Pilot</span>
     </a>
-    <nav class="nav" aria-label="Main">
-      <a href="index.html" data-i18n="nav_home">Home</a>
-      <a href="recipes.html" data-i18n="nav_recipes">Recipes</a>
-      <a href="guide-testers.html" data-i18n="nav_testers">For testers</a>
-      <a href="guide-writers.html" data-i18n="nav_writers">For writers</a>
-      <a href="about.html" data-i18n="nav_about">About</a>
-    </nav>
     <div id="langswitch" class="langs" role="group"></div>
+    <button type="button" id="menu-toggle" class="menu-toggle" aria-controls="site-nav" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span><span class="menu-label" data-i18n="menu">Menu</span></button>
+    <nav id="site-nav" class="nav" aria-label="Main">
+      <ul>
+        <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+        <li><a href="recipes.html" data-i18n="nav_recipes">Recipes</a></li>
+        <li><a href="guide-testers.html" data-i18n="nav_testers">For testers</a></li>
+        <li><a href="guide-writers.html" data-i18n="nav_writers">For writers</a></li>
+        <li><a href="about.html" data-i18n="nav_about">About</a></li>
+      </ul>
+    </nav>
   </div>
 </header>"""
 
 FOOTER = """<footer class="site-footer no-print">
-  <div class="wrap">
-    <p><span data-i18n="footer_contact">Questions? Write to</span> <a id="contact" href="mailto:afrocipe12@gmail.com">afrocipe12@gmail.com</a></p>
-    <p class="fine" data-i18n="footer_note">A pilot by Afrocipe.</p>
+  <div class="wrap footer-grid">
+    <div>
+      <p class="footer-name">Afrocipe</p>
+      <p data-i18n="footer_tagline">Help us test African recipes.</p>
+    </div>
+    <nav aria-label="Footer">
+      <p class="footer-h" data-i18n="footer_explore">Explore</p>
+      <ul>
+        <li><a href="recipes.html" data-i18n="nav_recipes">Recipes</a></li>
+        <li><a href="guide-testers.html" data-i18n="guide_testers">Guide for testers</a></li>
+        <li><a href="guide-writers.html" data-i18n="guide_writers">Guide for recipe writers</a></li>
+        <li><a href="about.html" data-i18n="home_about_link">More about Afrocipe</a></li>
+      </ul>
+    </nav>
+    <div>
+      <p class="footer-h" data-i18n="footer_contact">Questions? Write to</p>
+      <p><a id="contact" href="mailto:afrocipe12@gmail.com">afrocipe12@gmail.com</a></p>
+    </div>
   </div>
-</footer>
+  <div class="wrap">
+    <div class="footer-base">
+      <p><small data-i18n="footer_rights">&copy; 2026 Afrocipe. Recipes belong to their writers.</small></p>
+      <p><small data-i18n="footer_note">A pilot by Afrocipe.</small></p>
+    </div>
+  </div>
+</footer>"""
+
+# The pages whose <main> is written by hand: file name -> (title, title key, extra head lines, page scripts).
+SHELLS = {
+    "index": ("Afrocipe Pilot", "", "", ()),
+    "recipes": ("Recipes - Afrocipe Pilot", "recipes_title", "", ("recipes.js",)),
+    "recipe": ("Recipe - Afrocipe Pilot", "", "", ("recipe.js",)),
+    "dashboard": ("Dashboard - Afrocipe Pilot", "dash_title", '<meta name="robots" content="noindex, nofollow">\n', ("dashboard.js",)),
+}
+
+
+def document(title, main, title_key="", head_extra="", scripts=()):
+    return """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="%s">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>%s</title>
+<meta name="description" content="Help test African recipes. Share a recipe, or cook one and send a report.">
+%s<meta name="theme-color" content="#0B3D2E">
+<link rel="icon" href="assets/AFROCIPE_Glyph_Master_RGB.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/early.js"></script>
+</head>
+<body%s>
+%s
+<main id="main">
+%s
+</main>
+%s
 <script src="js/config.js"></script>
 <script src="js/i18n.js"></script>
-<script src="js/common.js"></script>"""
+<script src="js/common.js"></script>
+%s</body>
+</html>
+""" % (CSP, title, head_extra, ' data-title="%s"' % title_key if title_key else "", HEADER, main.strip("\n"), FOOTER,
+       "".join('<script src="js/%s"></script>\n' % s for s in scripts))
 
 
 def inline(text, lang):
@@ -128,37 +188,27 @@ def render(md, lang):
 
 def page(name):
     blocks = []
-    for lang in LANGS:
-        md = (ROOT / "content" / ("%s.%s.md" % (name, lang))).read_text(encoding="utf-8")
-        blocks.append('<article class="prose" lang="%s" data-lang="%s">\n%s\n</article>' % (lang, lang, render(md, lang)))
     tools = ('<p class="tools no-print"><button type="button" class="btn btn-quiet" data-print data-i18n="print_pdf">'
              'Print or save as PDF</button></p>\n') if name in PRINTABLE else ""
-    return """<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="%s">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>%s - Afrocipe Pilot</title>
-<meta name="description" content="Help test African recipes. Share a recipe, or cook one and send a report.">
-<link rel="icon" href="assets/AFROCIPE_Glyph_Master_RGB.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-%s
-<main id="main" class="wrap">
-%s%s
-</main>
-%s
-</body>
-</html>
-""" % (CSP, PAGES[name], HEADER, tools, "\n".join(blocks), FOOTER)
+    for lang in LANGS:
+        md = (ROOT / "content" / ("%s.%s.md" % (name, lang))).read_text(encoding="utf-8")
+        head, _, rest = md.partition("\n## ")          # the title and any introduction come before the first section
+        intro = render(head, lang).replace("<p>", '<p class="lead">')
+        blocks.append('<article lang="%s" data-lang="%s">\n<header class="page-head"><div class="wrap">\n%s\n%s</div></header>\n'
+                      '<div class="wrap section prose">\n%s\n</div>\n</article>'
+                      % (lang, lang, intro, tools, render("## " + rest, lang)))
+    return document("%s - Afrocipe Pilot" % PAGES[name], "\n".join(blocks))
+
+
+def shell(name):
+    title, key, extra, scripts = SHELLS[name]
+    return document(title, (ROOT / "content" / "pages" / (name + ".html")).read_text(encoding="utf-8"), key, extra, scripts)
 
 
 def main():
     check, stale = "--check" in sys.argv[1:], []
-    for name in PAGES:
-        target, text = ROOT / "site" / (name + ".html"), page(name)
+    for name in list(PAGES) + list(SHELLS):
+        target, text = ROOT / "site" / (name + ".html"), (page(name) if name in PAGES else shell(name))
         if check:
             if not target.exists() or target.read_text(encoding="utf-8") != text:
                 stale.append(target.name)

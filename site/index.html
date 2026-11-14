@@ -6,63 +6,104 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Afrocipe Pilot</title>
 <meta name="description" content="Help test African recipes. Share a recipe, or cook one and send a report.">
+<meta name="theme-color" content="#0B3D2E">
 <link rel="icon" href="assets/AFROCIPE_Glyph_Master_RGB.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/style.css">
+<script src="js/early.js"></script>
 </head>
 <body>
 <a class="skip" href="#main" data-i18n="skip">Skip to content</a>
 <header class="site-header no-print">
   <div class="wrap bar">
     <a class="brand" href="index.html">
-      <span class="logo"><img src="assets/AFROCIPE_Glyph_Master_RGB.svg" alt="" width="1000" height="593"></span>
-      <span class="brand-name" data-i18n="site_name">Afrocipe Pilot</span>
+      <img class="logo" src="assets/AFROCIPE_Glyph_Master_RGB.svg" alt="" width="1000" height="593">
+      <span class="brand-name">Afrocipe</span>
+      <span class="brand-tag" data-i18n="brand_tag">Pilot</span>
     </a>
-    <nav class="nav" aria-label="Main">
-      <a href="index.html" data-i18n="nav_home">Home</a>
-      <a href="recipes.html" data-i18n="nav_recipes">Recipes</a>
-      <a href="guide-testers.html" data-i18n="nav_testers">For testers</a>
-      <a href="guide-writers.html" data-i18n="nav_writers">For writers</a>
-      <a href="about.html" data-i18n="nav_about">About</a>
-    </nav>
     <div id="langswitch" class="langs" role="group"></div>
+    <button type="button" id="menu-toggle" class="menu-toggle" aria-controls="site-nav" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span><span class="menu-label" data-i18n="menu">Menu</span></button>
+    <nav id="site-nav" class="nav" aria-label="Main">
+      <ul>
+        <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+        <li><a href="recipes.html" data-i18n="nav_recipes">Recipes</a></li>
+        <li><a href="guide-testers.html" data-i18n="nav_testers">For testers</a></li>
+        <li><a href="guide-writers.html" data-i18n="nav_writers">For writers</a></li>
+        <li><a href="about.html" data-i18n="nav_about">About</a></li>
+      </ul>
+    </nav>
   </div>
 </header>
-<main id="main" class="wrap">
+<main id="main">
   <section class="hero">
-    <h1 data-i18n="home_title">Help us test African recipes</h1>
-    <p class="lead" data-i18n="home_lead">Afrocipe is building a trusted record of African dishes: recipes written down clearly, with where they come from, and tried out by people cooking at home.</p>
-    <p class="lead" data-i18n="home_lead2">This pilot asks one question: can someone who has never cooked a dish make it from the written recipe alone?</p>
-    <p><a href="about.html" data-i18n="home_about_link">More about Afrocipe</a></p>
+    <div class="wrap hero-grid">
+      <div>
+        <h1 data-i18n="home_title">Help us test African recipes</h1>
+        <p class="lead" data-i18n="home_lead">Afrocipe is building a trusted record of African dishes: recipes written down clearly, with where they come from, and tried out by people cooking at home.</p>
+        <p class="lead" data-i18n="home_lead2">This pilot asks one question: can someone who has never cooked a dish make it from the written recipe alone?</p>
+        <p class="hero-actions">
+          <a class="btn" data-form="submit" href="https://tally.so/r/RWdKp4" data-i18n="btn_share">Share a recipe</a>
+          <a class="btn btn-quiet" href="recipes.html" data-i18n="btn_test">Test a recipe</a>
+        </p>
+        <p class="hero-more"><a href="about.html" data-i18n="home_about_link">More about Afrocipe</a></p>
+      </div>
+      <img class="hero-mark" src="assets/AFROCIPE_Glyph_Master_RGB.svg" alt="" width="1000" height="593">
+    </div>
   </section>
-  <div class="roles">
-    <section class="role">
-      <h2 data-i18n="role_writer_h">Who can share a recipe?</h2>
-      <p data-i18n="role_writer">Anyone who knows a dish well enough to write it down. It can come from your family or community, or be your own creation. You do not need to be a professional cook.</p>
-      <a class="btn btn-big" data-form="submit" href="https://tally.so/r/RWdKp4" data-i18n="btn_share">Share a recipe</a>
-      <p class="more"><a href="guide-writers.html" data-i18n="guide_writers">Guide for recipe writers</a></p>
-    </section>
-    <section class="role">
-      <h2 data-i18n="role_tester_h">Who is a tester?</h2>
-      <p data-i18n="role_tester">Anyone who cooks at home, follows a recipe exactly as written, and tells us honestly what happened. No training is needed. You cannot test a recipe you wrote or helped with.</p>
-      <a class="btn btn-big" href="recipes.html" data-i18n="btn_test">Test a recipe</a>
-      <p class="more"><a data-form="signup" href="https://tally.so/r/QoeBd8" data-i18n="link_join">Join as a tester</a> <span aria-hidden="true">·</span> <a href="guide-testers.html" data-i18n="guide_testers">Guide for testers</a></p>
-    </section>
+  <section class="wrap section">
+    <h2 class="section-title" data-i18n="take_part_title">Who can take part?</h2>
+    <div class="roles">
+      <section class="role">
+        <h3 data-i18n="role_writer_h">Who can share a recipe?</h3>
+        <p data-i18n="role_writer">Anyone who knows a dish well enough to write it down. It can come from your family or community, or be your own creation. You do not need to be a professional cook.</p>
+        <p class="role-links"><a data-form="submit" href="https://tally.so/r/RWdKp4" data-i18n="btn_share">Share a recipe</a> <a href="guide-writers.html" data-i18n="guide_writers">Guide for recipe writers</a></p>
+      </section>
+      <section class="role">
+        <h3 data-i18n="role_tester_h">Who is a tester?</h3>
+        <p data-i18n="role_tester">Anyone who cooks at home, follows a recipe exactly as written, and tells us honestly what happened. No training is needed. You cannot test a recipe you wrote or helped with.</p>
+        <p class="role-links"><a data-form="signup" href="https://tally.so/r/QoeBd8" data-i18n="link_join">Join as a tester</a> <a href="recipes.html" data-i18n="btn_test">Test a recipe</a> <a href="guide-testers.html" data-i18n="guide_testers">Guide for testers</a></p>
+      </section>
+    </div>
+  </section>
+  <section class="band">
+    <div class="wrap section">
+      <h2 class="section-title" data-i18n="how_title">How it works</h2>
+      <ol class="steps">
+        <li data-i18n="how_1">A writer sends in a recipe. It appears on this site.</li>
+        <li data-i18n="how_2">A tester picks it and cooks it at home, using only what is written.</li>
+        <li data-i18n="how_3">The tester sends a short report.</li>
+        <li data-i18n="how_4">We read the reports together to see where the recipe needs to be clearer.</li>
+      </ol>
+    </div>
+  </section>
+  <div class="wrap section">
+    <p class="notice" data-i18n="notice" role="note"></p>
   </div>
-  <section class="panel">
-    <h2 data-i18n="how_title">How it works</h2>
-    <ol class="steps">
-      <li data-i18n="how_1">A writer sends in a recipe. It appears on this site.</li>
-      <li data-i18n="how_2">A tester picks it and cooks it at home, using only what is written.</li>
-      <li data-i18n="how_3">The tester sends a short report.</li>
-      <li data-i18n="how_4">We read the reports together to see where the recipe needs to be clearer.</li>
-    </ol>
-  </section>
-  <p class="notice" data-i18n="notice" role="note"></p>
 </main>
 <footer class="site-footer no-print">
+  <div class="wrap footer-grid">
+    <div>
+      <p class="footer-name">Afrocipe</p>
+      <p data-i18n="footer_tagline">Help us test African recipes.</p>
+    </div>
+    <nav aria-label="Footer">
+      <p class="footer-h" data-i18n="footer_explore">Explore</p>
+      <ul>
+        <li><a href="recipes.html" data-i18n="nav_recipes">Recipes</a></li>
+        <li><a href="guide-testers.html" data-i18n="guide_testers">Guide for testers</a></li>
+        <li><a href="guide-writers.html" data-i18n="guide_writers">Guide for recipe writers</a></li>
+        <li><a href="about.html" data-i18n="home_about_link">More about Afrocipe</a></li>
+      </ul>
+    </nav>
+    <div>
+      <p class="footer-h" data-i18n="footer_contact">Questions? Write to</p>
+      <p><a id="contact" href="mailto:afrocipe12@gmail.com">afrocipe12@gmail.com</a></p>
+    </div>
+  </div>
   <div class="wrap">
-    <p><span data-i18n="footer_contact">Questions? Write to</span> <a id="contact" href="mailto:afrocipe12@gmail.com">afrocipe12@gmail.com</a></p>
-    <p class="fine" data-i18n="footer_note">A pilot by Afrocipe.</p>
+    <div class="footer-base">
+      <p><small data-i18n="footer_rights">&copy; 2026 Afrocipe. Recipes belong to their writers.</small></p>
+      <p><small data-i18n="footer_note">A pilot by Afrocipe.</small></p>
+    </div>
   </div>
 </footer>
 <script src="js/config.js"></script>

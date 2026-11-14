@@ -711,7 +711,7 @@ class Site(unittest.TestCase):
         for name in ("guide-testers", "guide-writers", "about"):
             t = (ROOT / "site" / (name + ".html")).read_text(encoding="utf-8")
             for lang in ("en", "fr", "sw"):
-                self.assertEqual(t.count('<article class="prose" lang="%s" data-lang="%s">' % (lang, lang)), 1, name)
+                self.assertEqual(t.count('<article lang="%s" data-lang="%s">' % (lang, lang)), 1, name)
             for href in re.findall(r'href="([^"]+)"', t):
                 self.assertRegex(href, r"^(#main|[a-z-]+\.html|assets/[\w.]+|css/style\.css|mailto:afrocipe12@gmail\.com|"
                                        r"https://tally\.so/r/\w+)$", name)
@@ -722,6 +722,9 @@ class Site(unittest.TestCase):
         for p in sorted((ROOT / "site").glob("*.html")):
             t = p.read_text(encoding="utf-8")
             self.assertIn(make_pages.HEADER, t, p.name)
+            self.assertIn(make_pages.FOOTER, t, p.name)
+            self.assertEqual(t.count("<main "), 1, p.name)
+            self.assertEqual(t.count("<h1"), 3 if "data-lang" in t else (0 if p.name == "recipe.html" else 1), p.name)
             for key in set(re.findall(r'data-i18n="(\w+)"', t)):
                 self.assertEqual(len(re.findall(r"^    %s: " % key, i18n, re.M)), 3, "%s %s" % (p.name, key))
 

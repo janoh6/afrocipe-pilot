@@ -2,6 +2,12 @@
 var DICT = {
   en: {
     site_name: "Afrocipe Pilot",
+    brand_tag: "Pilot",
+    menu: "Menu",
+    take_part_title: "Who can take part?",
+    footer_tagline: "Help us test African recipes.",
+    footer_explore: "Explore",
+    footer_rights: "© 2026 Afrocipe. Recipes belong to their writers.",
     skip: "Skip to content",
     nav_home: "Home",
     nav_recipes: "Recipes",
@@ -87,6 +93,12 @@ var DICT = {
   },
   fr: {
     site_name: "Pilote Afrocipe",
+    brand_tag: "Pilote",
+    menu: "Menu",
+    take_part_title: "Qui peut participer ?",
+    footer_tagline: "Aidez-nous à tester des recettes africaines.",
+    footer_explore: "Explorer",
+    footer_rights: "© 2026 Afrocipe. Les recettes appartiennent à leurs auteurs.",
     skip: "Aller au contenu",
     nav_home: "Accueil",
     nav_recipes: "Recettes",
@@ -172,6 +184,12 @@ var DICT = {
   },
   sw: {
     site_name: "Majaribio ya Afrocipe",
+    brand_tag: "Majaribio",
+    menu: "Menyu",
+    take_part_title: "Nani anaweza kushiriki?",
+    footer_tagline: "Tusaidie kujaribu resipi za Kiafrika.",
+    footer_explore: "Chunguza",
+    footer_rights: "© 2026 Afrocipe. Resipi ni mali ya waandishi wake.",
     skip: "Ruka hadi maudhui",
     nav_home: "Mwanzo",
     nav_recipes: "Resipi",
