@@ -713,7 +713,7 @@ class Site(unittest.TestCase):
             for lang in ("en", "fr", "sw"):
                 self.assertEqual(t.count('<article class="prose" lang="%s" data-lang="%s">' % (lang, lang)), 1, name)
             for href in re.findall(r'href="([^"]+)"', t):
-                self.assertRegex(href, r"^(#main|[a-z-]+\.html|assets/[\w.]+|css/style\.css|mailto:hello@afrocipe\.com|"
+                self.assertRegex(href, r"^(#main|[a-z-]+\.html|assets/[\w.]+|css/style\.css|mailto:afrocipe12@gmail\.com|"
                                        r"https://tally\.so/r/\w+)$", name)
 
     def test_every_page_has_the_same_header_and_every_key_exists(self):

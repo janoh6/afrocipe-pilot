@@ -46,4 +46,4 @@ Les formules comme « cuire jusqu'à ce que ce soit prêt » ou « ajouter assez
 - **Ne mettez pas de données personnelles dans le texte de la recette.** N'écrivez pas votre nom, votre numéro de téléphone ou votre adresse dans les ingrédients ou les étapes, car ce texte s'affiche sur le site.
 - **Vous ne testerez pas votre propre recette.** Les testeurs qui l'essaient doivent être des personnes qui n'ont pris aucune part à sa rédaction. Cela inclut toute personne qui vous l'a apprise ou qui l'a corrigée.
 - **Votre accord** se trouve à la première page du formulaire : votre recette reste à vous, nous vous nommons ou nous nommons la personne ou la communauté que vous indiquez, et vous pouvez nous demander à tout moment d'arrêter de l'utiliser ou de la retirer du site. Sur le site du pilote, les recettes s'affichent sans nom.
-- **Des questions :** écrivez à [hello@afrocipe.com](mailto:hello@afrocipe.com).
+- **Des questions :** écrivez à [afrocipe12@gmail.com](mailto:afrocipe12@gmail.com).

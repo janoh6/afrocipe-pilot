@@ -46,4 +46,4 @@ Words like "cook until done" or "add enough water" are where testers get lost. W
 - **Keep personal details out of the recipe text.** Do not write your name, phone number or address in the ingredients or steps, because that text is shown on the site.
 - **You will not test your own recipe.** The testers who try it must be people who had no part in writing it. That includes anyone who taught it to you or corrected it.
 - **Your agreement** is on the first page of the form: you keep your recipe, we credit you or the person or community you name, and you can ask us to stop using it or to take it off the site at any time. On the pilot site, recipes are shown without names.
-- **Questions:** email [hello@afrocipe.com](mailto:hello@afrocipe.com).
+- **Questions:** email [afrocipe12@gmail.com](mailto:afrocipe12@gmail.com).

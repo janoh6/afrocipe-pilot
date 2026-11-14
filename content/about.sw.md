@@ -29,4 +29,4 @@ Resipi inabaki kuwa ya mwandishi wake. Majina, barua pepe na hadithi ya resipi i
 
 ## Mawasiliano
 
-Andika kwa [hello@afrocipe.com](mailto:hello@afrocipe.com).
+Andika kwa [afrocipe12@gmail.com](mailto:afrocipe12@gmail.com).

@@ -1,7 +1,7 @@
 /* Public links. Form ids are also in ../config.json (the build side). */
 var SITE = {
   target: 5,
-  contact: "hello@afrocipe.com",
+  contact: "afrocipe12@gmail.com",
   forms: {
     submit: { en: "RWdKp4", fr: "VpQ1VJ", sw: "Ge9BVL" },
     report: { en: "GeKvWe", fr: "PR1Bl5", sw: "RWMBQ4" },

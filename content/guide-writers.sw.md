@@ -46,4 +46,4 @@ Maneno kama "pika hadi iive" au "ongeza maji ya kutosha" ndiyo mahali ambapo waj
 - **Usiweke taarifa binafsi kwenye maandishi ya resipi.** Usiandike jina lako, namba ya simu au anwani kwenye viambato au hatua, kwa sababu maandishi hayo yanaonyeshwa kwenye tovuti.
 - **Hutajaribu resipi yako mwenyewe.** Wajaribu wanaoijaribu lazima wawe watu ambao hawakushiriki katika kuiandika. Hii inajumuisha mtu yeyote aliyekufundisha resipi hiyo au aliyeisahihisha.
 - **Makubaliano yako** yako kwenye ukurasa wa kwanza wa fomu: resipi inabaki kuwa yako, tunakutaja wewe au mtu au jamii unayoitaja, na unaweza kutuomba tuache kuitumia au tuiondoe kwenye tovuti wakati wowote. Kwenye tovuti ya majaribio, resipi zinaonyeshwa bila majina.
-- **Maswali:** tuma barua pepe kwa [hello@afrocipe.com](mailto:hello@afrocipe.com).
+- **Maswali:** tuma barua pepe kwa [afrocipe12@gmail.com](mailto:afrocipe12@gmail.com).

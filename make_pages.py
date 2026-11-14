@@ -46,7 +46,7 @@ HEADER = """<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
 
 FOOTER = """<footer class="site-footer no-print">
   <div class="wrap">
-    <p><span data-i18n="footer_contact">Questions? Write to</span> <a id="contact" href="mailto:hello@afrocipe.com">hello@afrocipe.com</a></p>
+    <p><span data-i18n="footer_contact">Questions? Write to</span> <a id="contact" href="mailto:afrocipe12@gmail.com">afrocipe12@gmail.com</a></p>
     <p class="fine" data-i18n="footer_note">A pilot by Afrocipe.</p>
   </div>
 </footer>
@@ -66,7 +66,7 @@ def inline(text, lang):
             if target.startswith("form:"):
                 kind = target[5:]
                 out.append('<a data-form="%s" href="https://tally.so/r/%s">%s</a>' % (kind, FORMS[kind][lang], label))
-            elif re.fullmatch(r"[a-z-]+\.html|mailto:[a-z]+@afrocipe\.com", target):
+            elif re.fullmatch(r"[a-z-]+\.html|mailto:afrocipe12@gmail\.com", target):
                 out.append('<a href="%s">%s</a>' % (target, label))
             else:
                 raise SystemExit("make_pages: link target not allowed: %s" % target)

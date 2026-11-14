@@ -52,6 +52,6 @@ If you cook the same recipe again, send a new report each time. Every attempt co
 
 ## Questions and your details
 
-- **Questions about the pilot:** email [hello@afrocipe.com](mailto:hello@afrocipe.com).
+- **Questions about the pilot:** email [afrocipe12@gmail.com](mailto:afrocipe12@gmail.com).
 - **Questions about a recipe step:** we cannot explain it to you, because that would spoil the test. Do your best and record it as an unclear instruction.
 - **Your details:** your name and email are kept separate from your report. Published results never identify you, and you can withdraw at any time by emailing us.
