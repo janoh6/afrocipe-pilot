@@ -4,11 +4,15 @@ Afrocipe construit un répertoire fiable des plats africains. Chaque plat est é
 
 ## Notre mission
 
-!placeholder Énoncé de mission à venir.
+**Rendre le savoir culinaire africain accessible, attribuable, reproductible et utile au monde.**
+
+Nous documentons et structurons le savoir culinaire africain, nous préservons ses origines et son contexte culturel, et nous développons des systèmes fondés sur des preuves qui aident chacun à l'apprendre, à le reproduire, à l'étudier et à s'appuyer sur lui pour aller plus loin.
 
 ## Notre vision
 
-!placeholder Énoncé de vision à venir.
+**Un monde où le savoir culinaire africain est compris, valorisé et utilisé partout, sans perdre son lien avec les peuples et les cultures dont il est issu.**
+
+Nous imaginons les traditions culinaires africaines comme une partie intégrante de la culture alimentaire, de l'éducation, de l'innovation et du commerce dans le monde, soutenues par un savoir fiable qui se transmet entre les générations, les communautés et les continents.
 
 ## À propos de ce pilote
 

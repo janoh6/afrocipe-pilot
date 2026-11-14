@@ -4,11 +4,15 @@ Afrocipe is building a trusted record of African dishes. Each dish is written do
 
 ## Our mission
 
-!placeholder Mission statement to come.
+**To make African culinary knowledge accessible, attributable, reproducible, and useful to the world.**
+
+We document and structure African culinary knowledge, preserve its origins and cultural context, and develop evidence-based systems that help people learn, reproduce, study, and build upon it.
 
 ## Our vision
 
-!placeholder Vision statement to come.
+**A world where African culinary knowledge is understood, valued, and used everywhere, without losing its connection to the people and cultures from which it originates.**
+
+We envision African culinary traditions becoming an integral part of global food culture, education, innovation, and commerce, supported by reliable knowledge that can be passed between generations, communities, and continents.
 
 ## About this pilot
 

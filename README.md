@@ -22,7 +22,7 @@ Open http://localhost:8000. The fixture dashboard passphrase is `pilot-fixture`.
 
 The text lives in `content/<page>.<lang>.md` (`guide-testers`, `guide-writers`, `about`; `en`, `fr`, `sw`). After
 editing, run `python3 make_pages.py` and commit the regenerated `site/*.html` too; the tests fail if they differ.
-The mission and vision on the About page are placeholders (`!placeholder` lines) until the operator supplies them.
+The mission and vision on the About page are the operator's words (2026-11-14); the French and Swahili are translations.
 
 ## Hide a recipe
 

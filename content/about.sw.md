@@ -4,11 +4,15 @@ Afrocipe inajenga kumbukumbu ya kuaminika ya vyakula vya Kiafrika. Kila chakula 
 
 ## Dhamira yetu
 
-!placeholder Tamko la dhamira linakuja.
+**Kuufanya ujuzi wa upishi wa Kiafrika upatikane, utambuliwe chanzo chake, uweze kurudiwa, na uwe na manufaa kwa dunia.**
+
+Tunaandika na kupanga ujuzi wa upishi wa Kiafrika, tunahifadhi asili yake na muktadha wake wa kitamaduni, na tunajenga mifumo inayotegemea ushahidi inayowasaidia watu kujifunza, kuurudia, kuuchunguza na kujenga juu yake.
 
 ## Maono yetu
 
-!placeholder Tamko la maono linakuja.
+**Dunia ambamo ujuzi wa upishi wa Kiafrika unaeleweka, unathaminiwa na kutumika kila mahali, bila kupoteza uhusiano wake na watu na tamaduni unakotoka.**
+
+Tunaona mila za upishi za Kiafrika zikiwa sehemu kamili ya utamaduni wa chakula, elimu, ubunifu na biashara duniani, zikiungwa mkono na ujuzi wa kuaminika unaoweza kurithishwa kati ya vizazi, jamii na mabara.
 
 ## Kuhusu majaribio haya
 
