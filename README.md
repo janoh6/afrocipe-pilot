@@ -18,6 +18,12 @@ Python 3 standard library only, plus `node` (for AES-GCM) at build time. No fram
 Open http://localhost:8000. The fixture dashboard passphrase is `pilot-fixture`. Fixtures are regenerated with
 `python3 tests/make_fixtures.py`. Add `?lang=fr` or `?lang=sw` to a page URL to switch language.
 
+## Guides and the About page
+
+The text lives in `content/<page>.<lang>.md` (`guide-testers`, `guide-writers`, `about`; `en`, `fr`, `sw`). After
+editing, run `python3 make_pages.py` and commit the regenerated `site/*.html` too; the tests fail if they differ.
+The mission and vision on the About page are placeholders (`!placeholder` lines) until the operator supplies them.
+
 ## Hide a recipe
 
 Add its id (the part after `recipe.html?id=`, or the Tally submission id) or its code (`R-XXXXXX`, shown on the page;

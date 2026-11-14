@@ -17,8 +17,8 @@
     return String(s || "").split("\n").map(function (l) { return l.replace(/^\s*(?:\d{1,2}\s*[.)]|[-*•])\s*/, "").trim(); })
       .filter(function (l) { return l.length > 0; });
   }
-  function section(title, node) {
-    var s = el("section", "block");
+  function section(title, node, name) {
+    var s = el("section", "block block-" + name);
     s.appendChild(el("h2", null, title));
     s.appendChild(node);
     return s;
@@ -31,7 +31,7 @@
 
   function render(r) {
     document.title = (r.dish_name || r.code) + " - " + t(lang, "site_name");
-    var art = el("article", "sheet");
+    var art = el("article", lines(r.ingredients).length ? "sheet sheet-cols" : "sheet");
     art.lang = r.lang;
     var top = el("p", "sheet-top");
     top.appendChild(el("span", "code", r.code));
@@ -54,12 +54,12 @@
     art.appendChild(dl);
 
     var ing = lines(r.ingredients);
-    if (ing.length) art.appendChild(section(t(lang, "f_ingredients"), list("ul", ing)));
+    if (ing.length) art.appendChild(section(t(lang, "f_ingredients"), list("ul", ing), "ingredients"));
     var steps = lines(r.method);
-    if (steps.length) art.appendChild(section(t(lang, "f_method"), list("ol", steps)));
+    if (steps.length) art.appendChild(section(t(lang, "f_method"), list("ol", steps), "method"));
     var signs = lines(r.signs);
-    if (signs.length) art.appendChild(section(t(lang, "f_signs"), list("ul", signs)));
-    if (r.finished_dish) art.appendChild(section(t(lang, "f_finished"), el("p", null, r.finished_dish)));
+    if (signs.length) art.appendChild(section(t(lang, "f_signs"), list("ul", signs), "signs"));
+    if (r.finished_dish) art.appendChild(section(t(lang, "f_finished"), el("p", null, r.finished_dish), "finished"));
     return art;
   }
 

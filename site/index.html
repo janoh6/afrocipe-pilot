@@ -17,45 +17,47 @@
       <span class="logo"><img src="assets/AFROCIPE_Glyph_Master_RGB.svg" alt="" width="1000" height="593"></span>
       <span class="brand-name" data-i18n="site_name">Afrocipe Pilot</span>
     </a>
+    <nav class="nav" aria-label="Main">
+      <a href="index.html" data-i18n="nav_home">Home</a>
+      <a href="recipes.html" data-i18n="nav_recipes">Recipes</a>
+      <a href="guide-testers.html" data-i18n="nav_testers">For testers</a>
+      <a href="guide-writers.html" data-i18n="nav_writers">For writers</a>
+      <a href="about.html" data-i18n="nav_about">About</a>
+    </nav>
     <div id="langswitch" class="langs" role="group"></div>
   </div>
-  <nav class="wrap nav" aria-label="Main">
-    <a href="index.html" data-i18n="nav_home">Home</a>
-    <a href="recipes.html" data-i18n="nav_recipes">Recipes</a>
-    <a data-form="signup" href="https://tally.so/r/QoeBd8" data-i18n="link_join">Join as a tester</a>
-  </nav>
 </header>
 <main id="main" class="wrap">
   <section class="hero">
     <h1 data-i18n="home_title">Help us test African recipes</h1>
-    <p class="lead" data-i18n="home_lead">Afrocipe is trying out its recipe sheets. Writers send in a recipe. Testers cook it and tell us what happened.</p>
-    <div class="actions">
-      <a class="btn btn-big" data-form="submit" href="https://tally.so/r/RWdKp4">
-        <span class="btn-title" data-i18n="btn_share">Share a recipe</span>
-        <span class="btn-sub" data-i18n="btn_share_sub">Write down a dish you know well.</span>
-      </a>
-      <a class="btn btn-big" href="recipes.html">
-        <span class="btn-title" data-i18n="btn_test">Test a recipe</span>
-        <span class="btn-sub" data-i18n="btn_test_sub">Pick a recipe, cook it, send a report.</span>
-      </a>
-    </div>
-    <p class="join"><a data-form="signup" href="https://tally.so/r/QoeBd8" data-i18n="link_join">Join as a tester</a></p>
+    <p class="lead" data-i18n="home_lead">Afrocipe is building a trusted record of African dishes: recipes written down clearly, with where they come from, and tried out by people cooking at home.</p>
+    <p class="lead" data-i18n="home_lead2">This pilot asks one question: can someone who has never cooked a dish make it from the written recipe alone?</p>
+    <p><a href="about.html" data-i18n="home_about_link">More about Afrocipe</a></p>
   </section>
+  <div class="roles">
+    <section class="role">
+      <h2 data-i18n="role_writer_h">Who can share a recipe?</h2>
+      <p data-i18n="role_writer">Anyone who knows a dish well enough to write it down. It can come from your family or community, or be your own creation. You do not need to be a professional cook.</p>
+      <a class="btn btn-big" data-form="submit" href="https://tally.so/r/RWdKp4" data-i18n="btn_share">Share a recipe</a>
+      <p class="more"><a href="guide-writers.html" data-i18n="guide_writers">Guide for recipe writers</a></p>
+    </section>
+    <section class="role">
+      <h2 data-i18n="role_tester_h">Who is a tester?</h2>
+      <p data-i18n="role_tester">Anyone who cooks at home, follows a recipe exactly as written, and tells us honestly what happened. No training is needed. You cannot test a recipe you wrote or helped with.</p>
+      <a class="btn btn-big" href="recipes.html" data-i18n="btn_test">Test a recipe</a>
+      <p class="more"><a data-form="signup" href="https://tally.so/r/QoeBd8" data-i18n="link_join">Join as a tester</a> <span aria-hidden="true">·</span> <a href="guide-testers.html" data-i18n="guide_testers">Guide for testers</a></p>
+    </section>
+  </div>
   <section class="panel">
     <h2 data-i18n="how_title">How it works</h2>
     <ol class="steps">
-      <li data-i18n="how_1">A writer sends in a recipe.</li>
-      <li data-i18n="how_2">A tester picks it and cooks it.</li>
-      <li data-i18n="how_3">The tester sends a report.</li>
+      <li data-i18n="how_1">A writer sends in a recipe. It appears on this site.</li>
+      <li data-i18n="how_2">A tester picks it and cooks it at home, using only what is written.</li>
+      <li data-i18n="how_3">The tester sends a short report.</li>
+      <li data-i18n="how_4">We read the reports together to see where the recipe needs to be clearer.</li>
     </ol>
   </section>
-  <section class="panel">
-    <h2 data-i18n="guides_title">Guides</h2>
-    <ul class="plain">
-      <li><a data-guide="testers" target="_blank" rel="noopener" href="#"><span data-i18n="guide_testers">Guide for testers</span> <span class="fine" data-i18n="new_tab">(opens in a new tab)</span></a></li>
-      <li><a data-guide="writers" target="_blank" rel="noopener" href="#"><span data-i18n="guide_writers">Guide for recipe writers</span> <span class="fine" data-i18n="new_tab">(opens in a new tab)</span></a></li>
-    </ul>
-  </section>
+  <p class="notice" data-i18n="notice" role="note"></p>
 </main>
 <footer class="site-footer no-print">
   <div class="wrap">

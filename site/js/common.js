@@ -32,8 +32,11 @@
   function links() {
     var m = document.querySelectorAll("[data-form]");
     for (var i = 0; i < m.length; i++) m[i].href = SITE.formUrl(m[i].getAttribute("data-form"), lang);
-    var g = document.querySelectorAll("[data-guide]");
-    for (var k = 0; k < g.length; k++) g[k].href = SITE.guides[g[k].getAttribute("data-guide")][lang];
+    var here = location.pathname.split("/").pop() || "index.html";
+    var nav = document.querySelectorAll(".nav a");
+    for (var k = 0; k < nav.length; k++) if (nav[k].getAttribute("href") === here) nav[k].setAttribute("aria-current", "page");
+    var pr = document.querySelectorAll("[data-print]");
+    for (var q = 0; q < pr.length; q++) pr[q].addEventListener("click", function () { window.print(); });
     var mail = document.getElementById("contact");
     if (mail) { mail.textContent = SITE.contact; mail.href = "mailto:" + SITE.contact; }
   }

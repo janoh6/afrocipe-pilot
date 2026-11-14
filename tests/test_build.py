@@ -689,7 +689,7 @@ class Site(unittest.TestCase):
         want = ["default-src 'self'", "connect-src 'self'", "img-src 'self' data:", "style-src 'self'",
                 "script-src 'self'", "base-uri 'none'", "form-action 'none'"]
         pages = sorted((ROOT / "site").glob("*.html"))
-        self.assertEqual(len(pages), 4)
+        self.assertEqual(len(pages), 7)
         for p in pages:
             t = p.read_text(encoding="utf-8")
             m = re.search(r'<meta http-equiv="Content-Security-Policy" content="([^"]*)"', t)
@@ -701,6 +701,35 @@ class Site(unittest.TestCase):
             self.assertNotRegex(t, r"<style\b|\sstyle\s*=|\son[a-z]+\s*=|javascript:", p.name)
         for p in self.files(".js"):
             self.assertNotRegex(p.read_text(encoding="utf-8"), r"setAttribute\(\s*['\"]style|cssText|createElement\(\s*['\"](script|style)", p.name)
+
+    # MUTATION: edit a content/*.md file without running make_pages.py, or edit a generated page by hand.
+    def test_content_pages_are_generated_from_content(self):
+        res = subprocess.run([sys.executable, str(ROOT / "make_pages.py"), "--check"], capture_output=True, text=True)
+        self.assertEqual(res.returncode, 0, res.stdout + res.stderr)
+
+    def test_content_pages_hold_each_language_once_and_only_allowed_links(self):
+        for name in ("guide-testers", "guide-writers", "about"):
+            t = (ROOT / "site" / (name + ".html")).read_text(encoding="utf-8")
+            for lang in ("en", "fr", "sw"):
+                self.assertEqual(t.count('<article class="prose" lang="%s" data-lang="%s">' % (lang, lang)), 1, name)
+            for href in re.findall(r'href="([^"]+)"', t):
+                self.assertRegex(href, r"^(#main|[a-z-]+\.html|assets/[\w.]+|css/style\.css|mailto:hello@afrocipe\.com|"
+                                       r"https://tally\.so/r/\w+)$", name)
+
+    def test_every_page_has_the_same_header_and_every_key_exists(self):
+        import make_pages
+        i18n = (ROOT / "site" / "js" / "i18n.js").read_text(encoding="utf-8")
+        for p in sorted((ROOT / "site").glob("*.html")):
+            t = p.read_text(encoding="utf-8")
+            self.assertIn(make_pages.HEADER, t, p.name)
+            for key in set(re.findall(r'data-i18n="(\w+)"', t)):
+                self.assertEqual(len(re.findall(r"^    %s: " % key, i18n, re.M)), 3, "%s %s" % (p.name, key))
+
+    def test_home_page_introduces_the_pilot_and_carries_the_notice(self):
+        t = (ROOT / "site" / "index.html").read_text(encoding="utf-8")
+        for key in ("home_lead", "home_lead2", "role_writer", "role_tester", "notice"):
+            self.assertIn('data-i18n="%s"' % key, t)
+        self.assertIn('data-i18n="notice"', (ROOT / "site" / "about.html").read_text(encoding="utf-8"))
 
     def test_dashboard_page_is_translated(self):
         t = (ROOT / "site" / "dashboard.html").read_text(encoding="utf-8")

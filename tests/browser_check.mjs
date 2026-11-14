@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT || "playwright");
 const base = process.argv[2] || "http://localhost:8765";
 const PASS = process.env.DASHBOARD_PASSPHRASE || "pilot-fixture";
-const pages = ["index.html", "recipes.html", "recipe.html?id=Jo11of", "dashboard.html"];
+const pages = ["index.html", "recipes.html", "recipe.html?id=Jo11of", "dashboard.html", "guide-testers.html", "guide-writers.html", "about.html"];
 const problems = [];
 let checked = 0;
 const browser = await chromium.launch();
@@ -32,6 +32,11 @@ for (const width of [360, 1280]) {
         const wantHead = { en: "Count", fr: "Élément", sw: "Kipengele" }[lang];
         if (!head.includes(wantHead)) problems.push(`${tag}: dashboard not translated (${head.trim()})`);
         if ((await page.locator("#out table").count()) !== 3) problems.push(`${tag}: expected 3 tables`);
+      }
+      if (/^(guide|about)/.test(p)) {
+        const shown = await page.locator("article.prose:visible").count();
+        const l = await page.locator("article.prose:visible").first().getAttribute("lang");
+        if (shown !== 1 || l !== lang) problems.push(`${tag}: expected one ${lang} block, saw ${shown} (${l})`);
       }
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
       if (overflow) problems.push(`${tag}: horizontal overflow`);
