@@ -147,8 +147,38 @@ small { font-size: .85rem; }
 .fact { display: grid; grid-template-columns: 7rem 1fr; gap: .5rem; }
 .fact dt { font-weight: 700; }
 .fact dd { margin: 0; overflow-wrap: anywhere; }
+.fact-line { display: block; }
+.sheet { font-size: 1.0625rem; line-height: 1.65; }
+.block > * { margin-top: 0; margin-bottom: 0; }
+.block > * + * { margin-top: .9rem; }
+.block h2 { font-size: 1.45rem; padding-bottom: .4rem; border-bottom: 3px solid var(--lime); }
+.block .group { font-size: 1.05rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-top: 1.6rem; }
+.block h2 + .group { margin-top: .9rem; }
+.lead-in { font-weight: 700; }
 .lines { margin: 0; padding-left: 1.4rem; }
 .lines li { margin-bottom: .45rem; overflow-wrap: anywhere; }
+/* Ingredients and steps: a whole row is the tick target, so a floury finger can hit it. */
+.ticks { list-style: none; margin: 0; padding: 0; }
+.ticks li { border-bottom: 1px solid var(--line); }
+.ticks li:last-child { border-bottom: 0; }
+.tick { display: flex; gap: .85rem; align-items: flex-start; padding: .7rem 0; cursor: pointer; overflow-wrap: anywhere; }
+.tick-text { flex: 1; min-width: 0; }
+.ticks-tick input { flex: none; width: 1.35rem; height: 1.35rem; margin: .2rem 0 0; accent-color: var(--forest); }
+.tick input:checked ~ .tick-text { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+.block-method { counter-reset: step; }
+.ticks-step li { counter-increment: step; }
+.ticks-step .tick { padding: 1rem 0; font-size: 1.125rem; }
+.ticks-step input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.num { flex: none; display: flex; align-items: center; justify-content: center; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: var(--forest); color: #fff; font-weight: 700; font-size: 1rem; }
+.num::before { content: counter(step); }
+.ticks-step input:checked + .num { background: var(--lime); color: var(--forest); }
+.ticks-step input:checked + .num::before { content: "\2713"; }
+.ticks-step input:focus-visible + .num { outline: 3px solid var(--gold); outline-offset: 2px; }
+.block-finished p { max-width: 46rem; }
+.cook-tools { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; align-items: center; justify-content: space-between; }
+.cook-hint { margin: 0; color: var(--muted); }
+.btn-quiet { font: inherit; font-weight: 600; color: var(--forest); background: #fff; border: 2px solid var(--forest); border-radius: .5rem; padding: .55rem 1rem; min-height: 2.75rem; cursor: pointer; }
+.btn-quiet[aria-pressed="true"] { background: var(--forest); color: #fff; }
 .report { padding: 1.25rem; background: var(--tint); border: 1px solid var(--line); border-radius: .75rem; }
 .reminder { font-weight: 700; }
 .report .btn { margin-bottom: 1rem; }
@@ -239,6 +269,8 @@ html[lang="sw"] [data-lang]:not([data-lang="sw"]) { display: none; }
   .sheet-cols > * { grid-column: 1 / -1; }
   .sheet-cols > .block-ingredients { grid-column: 1; grid-row: span 3; align-self: start; background: var(--tint); border: 1px solid var(--line); border-radius: .75rem; padding: 1.25rem 1.5rem; }
   .sheet-cols > .block-method, .sheet-cols > .block-signs, .sheet-cols > .block-finished { grid-column: 2; }
+  /* The ingredients stay in view while the method scrolls. */
+  .sheet-cols > .block-ingredients { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; }
 }
 @media print {
   .no-print { display: none !important; }
@@ -250,4 +282,7 @@ html[lang="sw"] [data-lang]:not([data-lang="sw"]) { display: none; }
   a { color: #000; text-decoration: none; }
   .prose h2 { break-after: avoid; }
   .stack tr, .prose li { break-inside: avoid; }
+  .sheet-cols > .block-ingredients { position: static; max-height: none; overflow: visible; }
+  .ticks li { break-inside: avoid; }
+  .num { background: none; color: #000; border: 1px solid #000; }
 }

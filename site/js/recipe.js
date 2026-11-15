@@ -14,19 +14,93 @@
   }
   /* One entry per non-empty line; a leading "1." or "-" is dropped, the list adds its own marker. */
   function lines(s) {
-    return String(s || "").split("\n").map(function (l) { return l.replace(/^\s*(?:\d{1,2}\s*[.)]|[-*•])\s*/, "").trim(); })
+    return String(s || "").split("\n").map(function (l) { return l.replace(/^\s*(?:\d{1,2}\s*[.)]|[-*\u2022])\s*/, "").trim(); })
       .filter(function (l) { return l.length > 0; });
   }
-  function section(title, node, name) {
+  /* A writer's own sub-heading ("For the sauce", "Phase 1: ...") is a short line with no closing full stop that does
+     not start with an amount. Headings are never adjacent, never last, and at most a third of the lines: a recipe
+     written as short steps without full stops keeps every line as a step. The words are never changed. */
+  function headingLike(l) {
+    if (/:$/.test(l)) return l.length <= 80;
+    return l.length <= 60 && !/[.!?;,]$/.test(l) && !/^[\d\u00bc-\u00be\u2150-\u215e]/.test(l);
+  }
+  function groups(items) {
+    var marks = items.map(function (l, i) { return i < items.length - 1 && headingLike(l); });
+    var n = marks.filter(Boolean).length;
+    var adjacent = marks.some(function (m, i) { return m && marks[i + 1]; });
+    if (n === 0 || adjacent || n * 3 > items.length) marks = items.map(function () { return false; });
+    var out = [{ title: "", items: [] }];
+    items.forEach(function (l, i) {
+      if (marks[i]) out.push({ title: l.replace(/:$/, ""), items: [] });
+      else out[out.length - 1].items.push(l);
+    });
+    return out.filter(function (g) { return g.title || g.items.length; });
+  }
+  /* "Soak the bread: tear it..." shows its short label in bold, so a cook can find the step at a glance. */
+  function withLead(parent, text) {
+    var i = text.indexOf(": ");
+    if (i >= 2 && i <= 45 && i < text.length - 2) {
+      parent.appendChild(el("strong", "lead-in", text.slice(0, i + 1)));
+      parent.appendChild(document.createTextNode(text.slice(i + 1)));
+    } else parent.appendChild(document.createTextNode(text));
+    return parent;
+  }
+  function section(title, nodes, name) {
     var s = el("section", "block block-" + name);
     s.appendChild(el("h2", null, title));
-    s.appendChild(node);
+    nodes.forEach(function (n) { s.appendChild(n); });
     return s;
   }
-  function list(tag, items) {
-    var l = el(tag, "lines");
-    items.forEach(function (i) { l.appendChild(el("li", null, i)); });
-    return l;
+  /* kind: "tick" (a box to tick off), "step" (numbered across the whole method, tick when done) or "plain". */
+  function grouped(items, kind) {
+    var nodes = [];
+    groups(items).forEach(function (g) {
+      if (g.title) nodes.push(el("h3", "group", g.title));
+      if (!g.items.length) return;
+      var l = el(kind === "step" ? "ol" : "ul", kind === "plain" ? "lines" : "ticks ticks-" + kind);
+      g.items.forEach(function (i) {
+        var li = el("li");
+        if (kind === "plain") withLead(li, i);
+        else {
+          var label = el("label", "tick");
+          var box = el("input");
+          box.type = "checkbox";
+          label.appendChild(box);
+          if (kind === "step") label.appendChild(el("span", "num"));
+          label.appendChild(withLead(el("span", "tick-text"), i));
+          li.appendChild(label);
+        }
+        l.appendChild(li);
+      });
+      nodes.push(l);
+    });
+    return nodes;
+  }
+  function paragraphs(s) {
+    return String(s || "").split("\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.length > 0; })
+      .map(function (l) { return withLead(el("p"), l); });
+  }
+  /* Keep the screen on while cooking, where the browser can (Screen Wake Lock). */
+  function tools() {
+    var box = el("div", "cook-tools no-print");
+    box.appendChild(el("p", "cook-hint", t(lang, "tick_hint")));
+    if (!("wakeLock" in navigator)) return box;
+    var lock = null, wanted = false;
+    var b = el("button", "btn-quiet", t(lang, "keep_on"));
+    b.type = "button";
+    b.setAttribute("aria-pressed", "false");
+    function show() { b.setAttribute("aria-pressed", wanted ? "true" : "false"); b.textContent = t(lang, wanted ? "keep_on_active" : "keep_on"); }
+    function acquire() {
+      navigator.wakeLock.request("screen").then(function (l) { lock = l; }).catch(function () { wanted = false; show(); });
+    }
+    b.addEventListener("click", function () {
+      wanted = !wanted;
+      if (wanted) acquire(); else if (lock) { lock.release().catch(function () {}); lock = null; }
+      show();
+    });
+    document.addEventListener("visibilitychange", function () { if (wanted && document.visibilityState === "visible") acquire(); });
+    box.appendChild(b);
+    return box;
   }
 
   function render(r) {
@@ -50,18 +124,21 @@
       if (!p[1]) return;
       var row = el("div", "fact");
       row.appendChild(el("dt", null, t(lang, p[0])));
-      row.appendChild(el("dd", null, p[1].replace(/\s*\n\s*/g, ", ")));
+      var dd = el("dd");
+      String(p[1]).split("\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.length > 0; })
+        .forEach(function (l) { dd.appendChild(el("span", "fact-line", l)); });
+      row.appendChild(dd);
       dl.appendChild(row);
     });
     art.appendChild(dl);
 
     var ing = lines(r.ingredients);
-    if (ing.length) art.appendChild(section(t(lang, "f_ingredients"), list("ul", ing), "ingredients"));
+    if (ing.length) art.appendChild(section(t(lang, "f_ingredients"), grouped(ing, "tick"), "ingredients"));
     var steps = lines(r.method);
-    if (steps.length) art.appendChild(section(t(lang, "f_method"), list("ol", steps), "method"));
+    if (steps.length) art.appendChild(section(t(lang, "f_method"), grouped(steps, "step"), "method"));
     var signs = lines(r.signs);
-    if (signs.length) art.appendChild(section(t(lang, "f_signs"), list("ul", signs), "signs"));
-    if (r.finished_dish) art.appendChild(section(t(lang, "f_finished"), el("p", null, r.finished_dish), "finished"));
+    if (signs.length) art.appendChild(section(t(lang, "f_signs"), grouped(signs, "plain"), "signs"));
+    if (r.finished_dish) art.appendChild(section(t(lang, "f_finished"), paragraphs(r.finished_dish), "finished"));
     return art;
   }
 
@@ -83,6 +160,7 @@
       var r = (Array.isArray(list) ? list : []).filter(function (x) { return x.id === id; })[0];
       if (!r) { status.textContent = t(lang, "not_found"); return; }
       status.textContent = "";
+      root.appendChild(tools());
       root.appendChild(render(r));
       root.appendChild(report(r));
     })
