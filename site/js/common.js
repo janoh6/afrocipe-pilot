@@ -48,7 +48,7 @@
     var pr = document.querySelectorAll("[data-print]");
     for (var q = 0; q < pr.length; q++) pr[q].addEventListener("click", function () { window.print(); });
     var mail = document.getElementById("contact");
-    if (mail) { mail.textContent = SITE.contact; mail.href = "mailto:" + SITE.contact; }
+    if (mail) mail.href = "mailto:" + SITE.contact;
   }
 
   apply();

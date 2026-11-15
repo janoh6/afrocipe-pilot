@@ -52,6 +52,6 @@ Si vous cuisinez à nouveau la même recette, envoyez un nouveau compte rendu à
 
 ## Questions et vos données
 
-- **Questions sur le pilote :** écrivez à [afrocipe12@gmail.com](mailto:afrocipe12@gmail.com).
+- **Questions sur le pilote :** [contactez-nous](mailto:afrocipe12@gmail.com).
 - **Questions sur une étape de la recette :** nous ne pouvons pas vous l'expliquer, car cela fausserait le test. Faites de votre mieux et notez-la comme une instruction peu claire.
 - **Vos données :** votre nom et votre e-mail sont conservés séparément de votre compte rendu. Les résultats publiés ne permettent jamais de vous identifier, et vous pouvez vous retirer à tout moment en nous écrivant.

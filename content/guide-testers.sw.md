@@ -52,6 +52,6 @@ Ukipika resipi ileile tena, tuma ripoti mpya kila mara. Kila jaribio linahesabiw
 
 ## Maswali na taarifa zako
 
-- **Maswali kuhusu majaribio:** tuma barua pepe kwa [afrocipe12@gmail.com](mailto:afrocipe12@gmail.com).
+- **Maswali kuhusu majaribio:** [wasiliana nasi](mailto:afrocipe12@gmail.com).
 - **Maswali kuhusu hatua ya resipi:** hatuwezi kukueleza, kwa sababu hilo lingeharibu jaribio. Fanya uwezavyo na uiandike kama maelekezo yasiyo wazi.
 - **Taarifa zako:** jina lako na barua pepe huhifadhiwa kando na ripoti yako. Matokeo yanayochapishwa hayakutambulishi kamwe, na unaweza kujiondoa wakati wowote kwa kututumia barua pepe.

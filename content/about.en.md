@@ -29,4 +29,4 @@ A recipe stays its writer's. Names, emails and the story of where a recipe comes
 
 ## Contact
 
-Write to [afrocipe12@gmail.com](mailto:afrocipe12@gmail.com).
+[Contact us](mailto:afrocipe12@gmail.com).
