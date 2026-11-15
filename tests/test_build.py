@@ -123,73 +123,68 @@ class AllowList(unittest.TestCase):
         self.assertEqual(r["tests"], 0)
 
 
-EN_OPT = fixturelib.load_config()["submission_forms"]["en"]["fields"]["consent"]["option"]
+class EveryRecipeIsShown(unittest.TestCase):
+    # MUTATION: skip a submission in build.build_recipes for any reason other than the hide list
+    # (e.g. add `if not sub.get("responses"): continue`, or read an answer to decide): these tests must fail.
+    def test_every_submission_is_published_in_every_language(self):
+        for consent_question in (True, False):
+            w = fixturelib.World(consent_question=consent_question)
+            for lang in build.LANGS:
+                w.recipe(lang, "all_" + lang, dish_name="Dish " + lang)
+                w.recipe(lang, "bare_" + lang, dish_name="Bare " + lang, other_names="", signs="", licence=2, origin=1)
+            code, so, se, out = run(w)
+            self.assertEqual(code, 0, se)
+            self.assertEqual({r["id"] for r in recipes_of(out)},
+                             {p + l for p in ("all_", "bare_") for l in build.LANGS}, consent_question)
+            self.assertIn("build ok: 6 recipes published", so)
 
-
-class Consent(unittest.TestCase):
-    # MUTATION: drop the consent check in build.build_recipes (remove the `if not form.ticked(...)`
-    # branch): the absent-recipe assertions below must fail.
-    def test_missing_or_unticked_consent_is_absent(self):
-        w = fixturelib.World()
-        w.recipe("en", "yesA01")
-        w.recipe("en", "noneA1", consent=None)       # question exists, never answered
-        w.recipe("en", "falseA", consent=False)
-        w.recipe("en", "listFa", consent=[False])
-        w.recipe("en", "strFal", consent="false")
-        w.recipe("en", "listTr", consent=[EN_OPT])
+    def test_form_with_no_consent_question_builds(self):
+        w = fixturelib.World(consent_question=False)
+        self.assertNotIn("consent", [d[0] for d in w.sub["en"].defs])
+        w.recipe("en", "noq001")
         code, _, se, out = run(w)
         self.assertEqual(code, 0, se)
-        ids = {r["id"] for r in recipes_of(out)}
-        self.assertEqual(ids, {"yesA01", "listTr"})
+        self.assertEqual([r["id"] for r in recipes_of(out)], ["noq001"])
 
-    # MUTATION: make FormData.ticked treat any non-empty string or number as a tick again: the
-    # not-consented shapes below must fail.
-    def test_consent_allow_list_end_to_end_in_every_language(self):
+    # MUTATION: read the consent question again (map it in config and gate on it): the unticked and
+    # missing recipes disappear, or the marker shows in the output, and this test must fail.
+    def test_form_that_still_has_the_question_ignores_the_answer(self):
+        w = fixturelib.World()
+        self.assertIn("consent", [d[0] for d in w.sub["en"].defs])
+        answers = {"tickA1": True, "uuidA1": ["o-uuid"], "falseA": False, "noneA1": None, "listFa": [False],
+                   "strFal": "false", "marker": "MK_consent_answer", "markLs": ["MK_consent_list"], "emptyS": ""}
+        for lang in build.LANGS:
+            for sid, v in answers.items():
+                w.recipe(lang, lang + sid, consent=v)
+        w.recipe("en", "absent1", consent=None)       # the answer is not sent at all
+        code, _, se, out = run(w)
+        self.assertEqual(code, 0, se)
+        want = {l + s for l in build.LANGS for s in answers} | {"absent1"}
+        self.assertEqual({r["id"] for r in recipes_of(out)}, want)
+        text = all_output_text(out)
+        plain = json.dumps(json.loads(decrypt(out / "dashboard.enc.json", PASS).stdout))
+        for m in ("MK_consent_answer", "MK_consent_list", "consent", "Pilot website", "awaiting"):
+            self.assertNotIn(m, text, m)
+            self.assertNotIn(m, plain, m)
+
+    def test_config_with_a_consent_key_is_refused(self):
+        for lang in build.LANGS:
+            w = fixturelib.World()
+            cfg = copy.deepcopy(w.cfg)
+            cfg["submission_forms"][lang]["fields"]["consent"] = {"id": None, "title": "Pilot website", "option": "x"}
+            w.recipe(lang, "cfg001")
+            code, so, se, out = run(w, cfg=cfg)
+            self.assertNotEqual(code, 0, lang)
+            self.assertIn("consent", se)
+            self.assertIn("allow-list", se)
+            self.assertFalse((out / "recipes.json").exists())
+
+    def test_committed_config_has_no_consent_entry(self):
         cfg = fixturelib.load_config()
         for lang in build.LANGS:
-            opt = cfg["submission_forms"][lang]["fields"]["consent"]["option"]
-            other = [cfg["submission_forms"][l]["fields"]["consent"]["option"] for l in build.LANGS if l != lang][0]
-            w = fixturelib.World()
-            yes = {"boolTr": True, "uuid01": [opt], "uuidSt": opt, "uuid02": ["x", opt]}
-            no = {"non001": "Non", "hap001": "Hapana", "oth001": [other], "othSt1": other, "one001": 1,
-                  "true01": "true", "dict01": {"a": True}, "dict02": {opt: True}, "empty1": [], "none01": None,
-                  "listTr": [True], "emptyS": "", "zero01": 0, "yesStr": "yes", "dupl01": [other, "Oui"]}
-            for sid, v in list(yes.items()) + list(no.items()):
-                w.recipe(lang, sid, consent=v)
-            code, _, se, out = run(w)
-            self.assertEqual(code, 0, se)
-            self.assertEqual({r["id"] for r in recipes_of(out)}, set(yes), lang)
-
-    def test_consent_by_exact_configured_text(self):
-        w = fixturelib.World()
-        cfg = copy.deepcopy(w.cfg)
-        cfg["submission_forms"]["en"]["fields"]["consent"]["option_text"] = "I agree to the pilot site"
-        w.recipe("en", "text01", consent=["I agree to the pilot site"])
-        w.recipe("en", "text02", consent=["i agree to the pilot site"])
-        w.recipe("en", "text03", consent=["I agree"])
-        w.recipe("en", "text04", consent="I agree to the pilot site")      # a single string is a uuid, not text
-        code, _, se, out = run(w, cfg=cfg)
-        self.assertEqual(code, 0, se)
-        self.assertEqual({r["id"] for r in recipes_of(out)}, {"text01"})
-
-    def test_config_without_consent_option_is_refused(self):
-        w = fixturelib.World()
-        cfg = copy.deepcopy(w.cfg)
-        del cfg["submission_forms"]["fr"]["fields"]["consent"]["option"]
-        w.recipe("fr", "frc001")
-        code, _, se, out = run(w, cfg=cfg)
-        self.assertNotEqual(code, 0)
-        self.assertIn("consent", se)
-        self.assertFalse((out / "recipes.json").exists())
-
-    def test_no_consent_question_on_the_form_fails_closed(self):
-        w = fixturelib.World()
-        w.sub["en"].drop("consent")
-        w.recipe("en", "yesA01")
-        code, _, se, out = run(w)
-        self.assertNotEqual(code, 0)
-        self.assertIn("consent", se)
-        self.assertFalse((out / "recipes.json").exists())
+            self.assertNotIn("consent", cfg["submission_forms"][lang]["fields"])
+        self.assertNotIn("consent", json.dumps(cfg["submission_forms"]).lower())
+        build.load_config(ROOT / "config.json")
 
 
 class HideList(unittest.TestCase):
@@ -395,20 +390,20 @@ class Logging(unittest.TestCase):
         for m in ALLOWED_MARKERS + FORBIDDEN_MARKERS + ["MK_dish_swahili", "MK_ing_sw", "Mark01", "Mark02", PASS]:
             self.assertNotIn(m, logs, m)
 
-    # MUTATION: log the hidden / awaiting-consent / report / sign-up counts again: this test must fail.
+    # MUTATION: log the hidden / report / sign-up counts again: this test must fail.
     def test_public_log_has_no_private_totals(self):
         w = fixturelib.World()
         w.recipe("en", "pub001")
         w.recipe("en", "hid001")
         for i in range(3):
-            w.recipe("fr", "nc%04d" % i, consent=False)
+            w.recipe("fr", "nc%04d" % i, consent=False)       # shown, like any recipe
         for _ in range(4):
             w.report("sw", "pub001")
         w.report("sw", "pub001", contribution=0)
         w.signups("fr", 7)
         code, so, se, out = run(w, hidden=["hid001"])
         self.assertEqual(code, 0, se)
-        self.assertEqual(so.strip().splitlines(), ["build ok: 1 recipes published"])
+        self.assertEqual(so.strip().splitlines(), ["build ok: 4 recipes published"])
         self.assertEqual(se, "")
         for word in ("hidden", "awaiting", "consent", "report", "sign-up", "signup", "set aside", "sw=", "fr=", "en="):
             self.assertNotIn(word, (so + se).lower(), word)
@@ -463,17 +458,19 @@ class Dashboard(unittest.TestCase):
         w = fixturelib.World()
         w.recipe("en", "five01", dish_name="Five")
         w.recipe("fr", "two001", dish_name="Two")
-        w.recipe("sw", "nocon1", consent=False)
+        w.recipe("sw", "hid001")
         for _ in range(5):
             w.report("en", "five01", overall=0)
         w.report("fr", "two001", overall=1)
         w.report("sw", "two001", finished=1)
         w.signups("en", 2)
         w.signups("sw", 4)
-        code, _, se, out = run(w)
+        code, _, se, out = run(w, hidden=["hid001"])
         plain = json.loads(decrypt(out / "dashboard.enc.json", PASS).stdout)
         t = plain["totals"]
-        self.assertEqual((t["recipes_published"], t["hidden"], t["awaiting_consent"]), (2, 0, 1))
+        self.assertEqual((t["recipes_published"], t["hidden"]), (2, 1))
+        self.assertNotIn("awaiting_consent", t)
+        self.assertEqual(sorted(t), ["hidden", "recipes_published", "reports", "signups"])
         self.assertEqual(t["signups"], {"en": 2, "fr": 0, "sw": 4})
         self.assertEqual(t["reports"], {"en": 5, "fr": 1, "sw": 1})
         by = {r["code"]: r for r in plain["recipes"]}
@@ -545,32 +542,6 @@ class ReportCounts(unittest.TestCase):
         got = {r["id"]: r["tests"] for r in recipes_of(out)}
         self.assertEqual(len(got), 5)
         self.assertEqual(got["pg0000"], 5)
-
-    def test_answer_shapes_for_ticks(self):
-        f = build.FormData("x", "x", [{"id": "q", "type": "CHECKBOX", "title": "t", "fields": []}], [], [])
-        q = f.questions[0]
-        for val, want in ((True, True), (False, False), ([False], False), ([], False), ("opt-1", True),
-                          (["opt-1"], True), (["a", "opt-1"], True), (["opt-2"], False), ("opt-2", False),
-                          ("true", False), ("false", False), ("Non", False), ("Hapana", False), (1, False),
-                          (None, False), ({"a": True}, False), ({"opt-1": True}, False), ([True], False),
-                          (["Agree text"], True), (["agree text"], False), ("Agree text", False)):
-            sub = {"responses": [{"questionId": "q", "answer": val}]}
-            self.assertEqual(f.ticked(sub, q, "opt-1", "Agree text"), want, repr(val))
-        self.assertFalse(f.ticked({"responses": []}, q, "opt-1"))
-        # no configured option: only the boolean True counts
-        self.assertFalse(f.ticked({"responses": [{"questionId": "q", "answer": ["opt-1"]}]}, q, None))
-        self.assertTrue(f.ticked({"responses": [{"questionId": "q", "answer": True}]}, q, None))
-
-    # MUTATION: accept a bare True on any consent question again (drop the box count in FormData.ticked): must fail.
-    def test_true_for_another_box_of_the_consent_question_is_not_consent(self):
-        boxes = [{"uuid": "opt-1", "type": "CHECKBOX"}, {"uuid": "opt-2", "type": "CHECKBOX"}]
-        f = build.FormData("x", "x", [{"id": "q", "type": "CHECKBOXES", "title": "t", "fields": boxes}], [], [])
-        q = f.questions[0]
-        self.assertFalse(f.ticked({"responses": [{"questionId": "opt-2", "answer": True}]}, q, "opt-1"))
-        self.assertFalse(f.ticked({"responses": [{"questionId": "q", "answer": True}]}, q, "opt-1"))
-        self.assertFalse(f.ticked({"responses": [{"questionId": "opt-1", "answer": True}]}, q, None))
-        self.assertTrue(f.ticked({"responses": [{"questionId": "opt-1", "answer": True}]}, q, "opt-1"))
-        self.assertTrue(f.ticked({"responses": [{"questionId": "q", "answer": ["opt-1"]}]}, q, "opt-1"))
 
     # MUTATION: count a report whose contribution answer is not clearly "No" (or go back to YES_WORDS):
     # the next two tests must fail.

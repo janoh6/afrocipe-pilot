@@ -39,14 +39,13 @@ MAX_TEXT = 10000
 # --- the allow-list ---------------------------------------------------------
 # Logical fields read from a submission form. Nothing else is ever read:
 # not the name, the email, the agreement, the licence choice, the provenance
-# page or the uploads. Config may map only these (plus "consent", which is
-# read to decide, and never output).
+# page, the uploads or any consent tick. Config may map only these; any other
+# field name (a "consent" key included) stops the build.
 TEXT_FIELDS = (
     "dish_name", "other_names", "pilot_dish", "makes", "ingredients",
     "method", "signs", "total_time", "equipment", "finished_dish",
 )
-CONSENT_FIELD = "consent"
-SUBMISSION_FIELDS = (CONSENT_FIELD,) + TEXT_FIELDS
+SUBMISSION_FIELDS = TEXT_FIELDS
 # Fields of a public record, in output order.
 PUBLIC_FIELDS = ("id", "code", "lang", "submitted", "tests") + TEXT_FIELDS
 # Report-form fields: the recipe link and the outcome answers (counted, never published).
@@ -360,27 +359,6 @@ class FormData:
             return ", ".join(t for _, t in self.options(raw) if isinstance(t, str))
         return ""
 
-    def ticked(self, sub, question, option, option_text=None):
-        """Consent is an allow-list. Only these answers mean yes:
-          - the boolean True, on a question with at most one box, or keyed by the consent option's uuid,
-          - the consent option's uuid (alone, or in a list),
-          - a list holding the option's exact configured text.
-        Anything else (another option, "true", 1, a dict, [], None) is not consent. On a question with several
-        boxes, a bare True keyed by another box's uuid is that other box, not consent."""
-        raw = self.raw_answers(sub, question)
-        if raw is True:
-            if len([f for f in question.get("fields") or [] if f.get("uuid")]) <= 1:
-                return True
-            return bool(option) and any(r.get("questionId") == option and r.get("answer") is True
-                                        for r in sub.get("responses") or [])
-        if not option:
-            return False
-        if isinstance(raw, str):
-            return raw == option
-        if isinstance(raw, list):
-            return any(isinstance(v, str) and (v == option or (option_text and v == option_text)) for v in raw)
-        return False
-
 
 def fetch_form(api, key, form_id, need_blocks=True):
     """Questions, form blocks and all completed submissions of one form."""
@@ -432,8 +410,6 @@ def load_config(path):
         missing = sorted(set(SUBMISSION_FIELDS) - set(sf))
         if missing:
             raise BuildError("config lacks field(s): " + ", ".join(missing))
-        if not (sf[CONSENT_FIELD].get("option") or "").strip():
-            raise BuildError("consent option uuid is not configured (%s)" % lang)
         rf = cfg["report_forms"][lang]["fields"]
         extra = sorted(set(rf) - set(REPORT_FIELDS))
         if extra:
@@ -541,7 +517,7 @@ def count_reports(report_forms, cfg):
 
 
 def build_recipes(sub_forms, cfg, hidden, counts):
-    recipes, n_hidden, n_awaiting = [], 0, 0
+    recipes, n_hidden = [], 0
     # Hide by id or by the visible code (R-XXXXXX), ignoring case: a near miss must hide, not publish.
     hide_keys = {h.strip().casefold() for h in hidden}
     for lang in LANGS:
@@ -550,10 +526,6 @@ def build_recipes(sub_forms, cfg, hidden, counts):
         for sub in form.submissions:
             sid = str(sub.get("id") or "")
             if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", sid):
-                continue
-            ccfg = cfg["submission_forms"][lang]["fields"][CONSENT_FIELD]
-            if not form.ticked(sub, q[CONSENT_FIELD], ccfg.get("option"), ccfg.get("option_text")):
-                n_awaiting += 1
                 continue
             if sid.casefold() in hide_keys or ("R-" + sid[:6]).casefold() in hide_keys:
                 n_hidden += 1
@@ -569,17 +541,16 @@ def build_recipes(sub_forms, cfg, hidden, counts):
                 values[name] = clean_text(form.text(sub, q[name])) if name in q else ""
             recipes.append({k: values[k] for k in PUBLIC_FIELDS})
     recipes.sort(key=lambda r: (r["submitted"], r["id"]), reverse=True)
-    return recipes, n_hidden, n_awaiting
+    return recipes, n_hidden
 
 
-def dashboard_plain(recipes, n_hidden, n_awaiting, signups, per_lang, outcomes, target, now):
+def dashboard_plain(recipes, n_hidden, signups, per_lang, outcomes, target, now):
     return {
         "generated": now,
         "target_tests": target,
         "totals": {
             "recipes_published": len(recipes),
             "hidden": n_hidden,
-            "awaiting_consent": n_awaiting,
             "signups": signups,
             "reports": per_lang,
         },
@@ -630,15 +601,15 @@ def run_build(api, cfg, hidden, out_dir, passphrase, now):
     rep_forms = {l: fetch_form(api, "report " + l, cfg["report_forms"][l]["id"]) for l in LANGS}
     signups = {l: count_submissions(api, cfg["signup_forms"][l]) for l in LANGS}
     counts, outcomes, per_lang, excluded = count_reports(rep_forms, cfg)
-    recipes, n_hidden, n_awaiting = build_recipes(sub_forms, cfg, hidden, counts)
+    recipes, n_hidden = build_recipes(sub_forms, cfg, hidden, counts)
     target = int(cfg.get("target_tests", 5))
-    plain = dashboard_plain(recipes, n_hidden, n_awaiting, signups, per_lang, outcomes, target, now)
+    plain = dashboard_plain(recipes, n_hidden, signups, per_lang, outcomes, target, now)
     enc = encrypt_dashboard(plain, passphrase)
     write_atomic([
         (out_dir / "recipes.json", json.dumps(recipes, ensure_ascii=False, indent=1) + "\n"),
         (out_dir / "dashboard.enc.json", json.dumps(enc) + "\n"),
     ])
-    # The repository is public, so its log carries no private total (hidden, awaiting consent, reports, sign-ups).
+    # The repository is public, so its log carries no private total (hidden, reports, sign-ups).
     print("build ok: %d recipes published" % len(recipes), flush=True)
     return recipes
 

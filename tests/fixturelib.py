@@ -25,6 +25,8 @@ EXTRA_SUBMISSION_QUESTIONS = [
     ("taught", "INPUT_TEXT", "Who taught you this recipe? (optional)"),
     ("upload", "FILE_UPLOAD", "Photos or videos (optional)"),
 ]
+# The retired "Pilot website" tick box. A form may still carry it while the build ships first; the build ignores it.
+CONSENT_QUESTION = ("consent", "CHECKBOX", "Pilot website")
 EXTRA_REPORT_QUESTIONS = [
     ("name", "INPUT_TEXT", "Full name"),
     ("email", "INPUT_EMAIL", "Email"),
@@ -167,13 +169,16 @@ class Form:
 class World:
     """Nine forms matching config.json: 3 submission, 3 report, 3 sign-up."""
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg=None, consent_question=True):
+        """consent_question: the forms still carry the retired consent tick box (True) or no longer do."""
         self.cfg = cfg or load_config()
         self.sub, self.rep, self.signup = {}, {}, {}
         for l in LANGS:
             sf = self.cfg["submission_forms"][l]
             defs = [(k, TYPES.get(k, "INPUT_TEXT"), c["title"]) for k, c in sf["fields"].items()]
             defs += EXTRA_SUBMISSION_QUESTIONS
+            if consent_question:
+                defs.append(CONSENT_QUESTION)
             self.sub[l] = Form(sf["id"], defs, {k: c.get("id") for k, c in sf["fields"].items()})
             rf = self.cfg["report_forms"][l]
             defs = [(k, TYPES.get(k, "INPUT_TEXT"), c["title"]) for k, c in rf["fields"].items()]
@@ -235,9 +240,9 @@ def standard_world():
              signs="Unga unaachia sufuria.", equipment="Sufuria", finished_dish="Ugali laini.", submitted="2026-11-10")
     w.recipe("en", "Xss111", dish_name="<script>alert(1)</script> Soup", ingredients="<img src=x onerror=alert(1)>\n1 onion",
              method="1. <b>Boil</b> it.\n2. Write to cook@example.org or call +233 24 123 4567.", submitted="2026-11-11")
-    w.recipe("en", "Nocons", dish_name="Not consented", consent=False)
+    w.recipe("en", "Nocons", dish_name="Unticked tick box, still shown", consent=False)
     w.recipe("en", "Hidd3n", dish_name="Hidden by the operator")
-    w.recipe("en", "Nolegc", dish_name="Before the consent existed", consent=None)
+    w.recipe("en", "Nolegc", dish_name="No tick box answer, still shown", consent=None)
     for _ in range(5):
         w.report("en", "Jo11of", overall=0)
     w.report("en", "Jo11of", overall=1)

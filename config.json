@@ -1,15 +1,10 @@
 {
-  "_comment": "Form ids and logical field -> question mapping. Each field: {id, title}. A set id (the Tally question uuid) is matched first; otherwise the exact title (whitespace-normalised). The ids are the form-builder uuids. The REST API gives each question a short id, so an id is matched against the question id and against its fields' uuid / blockGroupUuid. Hidden fields (recipe, dish, version) are fields of the one HIDDEN_FIELDS question: their id is the field uuid, matched before the field name. Run `python3 build.py discover` to list questions and `python3 build.py shapes` to see answer structure. Choice answers are never matched by guessing: consent is the option uuid in the consent entry (optionally also option_text); contribution/overall use the configured option texts (an option uuid in an answer is first turned into its text); finished uses option positions.",
+  "_comment": "Form ids and logical field -> question mapping. Each field: {id, title}. A set id (the Tally question uuid) is matched first; otherwise the exact title (whitespace-normalised). The ids are the form-builder uuids. The REST API gives each question a short id, so an id is matched against the question id and against its fields' uuid / blockGroupUuid. Hidden fields (recipe, dish, version) are fields of the one HIDDEN_FIELDS question: their id is the field uuid, matched before the field name. Run `python3 build.py discover` to list questions and `python3 build.py shapes` to see answer structure. Only the allow-listed recipe text fields may be mapped: any other field name, a consent entry included, stops the build, and a consent question left on a form is ignored. Choice answers are never matched by guessing: contribution/overall use the configured option texts (an option uuid in an answer is first turned into its text); finished uses option positions.",
   "target_tests": 5,
   "submission_forms": {
     "en": {
       "id": "RWdKp4",
       "fields": {
-        "consent": {
-          "id": "612764d9-cbd9-4c8e-ba84-9d213691673e",
-          "title": "Pilot website",
-          "option": "64b3eb85-0e0c-4329-bde0-cbc7fdb621e4"
-        },
         "dish_name": {
           "id": "34f64b53-e2e1-456f-9fa1-744935108bbc",
           "title": "Name of the dish"
@@ -55,11 +50,6 @@
     "fr": {
       "id": "VpQ1VJ",
       "fields": {
-        "consent": {
-          "id": "f327d75f-1096-4e7b-9c38-1abac2840d1d",
-          "title": "Site du pilote",
-          "option": "ea1a1d7e-0c66-41d9-918c-f71d5e618924"
-        },
         "dish_name": {
           "id": "68eb0ab9-616c-472b-a655-12ea7b0a16a8",
           "title": "Nom du plat"
@@ -105,11 +95,6 @@
     "sw": {
       "id": "Ge9BVL",
       "fields": {
-        "consent": {
-          "id": "fab6d063-c5af-4aa2-a1c2-28e917e514e6",
-          "title": "Tovuti ya majaribio",
-          "option": "aa28b4d8-93f7-4fb8-8a53-bc22beb592c3"
-        },
         "dish_name": {
           "id": "e7487df1-9e53-4dff-adcc-ec33c8beebca",
           "title": "Jina la chakula"

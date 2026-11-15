@@ -1,7 +1,7 @@
 # Afrocipe pilot site
 
 A static site for `pilot.afrocipe.com`. Writers send recipes through Tally forms. A scheduled build reads the forms
-through the Tally API, publishes an allow-listed part of each consented recipe, counts reports per recipe and
+through the Tally API, publishes an allow-listed part of each submitted recipe that is not hidden, counts reports per recipe and
 writes a private, encrypted dashboard. The site is source material only: its recipes are not checked and its test
 counts are not a score. Design note: `docs/notes/2026-11-12-pilot-site.md` in the main Afrocipe repository.
 
@@ -63,9 +63,9 @@ that differs. A missing expected question fails the build and writes nothing.
 - Dashboard "reports" per language counts completed reports, not counting those where the contribution question was
   answered Yes. A completed report with no overall answer counts as "stopped".
 - Logs print only "build ok" and the number of published recipes (the repository is public). Hidden,
-  awaiting-consent, report and sign-up totals appear on the private dashboard only.
-- Consent is an allow-list: a recipe is published only when the consent answer is `true` or carries the consent
-  option uuid set in `config.json` (`consent.option`). Any other answer means not consented.
+  report and sign-up totals appear on the private dashboard only.
+- Every submitted recipe is published unless its id or code is in `hidden.txt`. There is no consent field: a
+  consent question still on a form is not read, and a `consent` key in `config.json` stops the build.
 - Report answers are read by the option texts and positions in `config.json`, never by guessing. A report whose
   contribution answer is Yes, missing or unrecognised is not counted; an unrecognised finished or overall answer
   counts under "Unrecognised" on the dashboard.

@@ -41,7 +41,7 @@
     out.appendChild(el("p", L("dash_built", { d: d.generated }), "fine"));
     out.appendChild(el("h2", L("dash_totals")));
     out.appendChild(table([L("dash_count"), L("dash_number")], [
-      [L("dash_published"), t0.recipes_published], [L("dash_hidden"), t0.hidden], [L("dash_awaiting"), t0.awaiting_consent]]));
+      [L("dash_published"), t0.recipes_published], [L("dash_hidden"), t0.hidden]]));
     out.appendChild(el("h2", L("dash_bylang")));
     out.appendChild(table([L("dash_language"), L("dash_signups"), L("dash_reports")],
       ["en", "fr", "sw"].map(function (l) { return [l.toUpperCase(), t0.signups[l], t0.reports[l]]; })));
