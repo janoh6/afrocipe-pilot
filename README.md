@@ -64,7 +64,8 @@ that differs. A missing expected question fails the build and writes nothing.
   answered Yes. A completed report with no overall answer counts as "stopped".
 - Logs print only "build ok" and the number of published recipes (the repository is public). Hidden,
   report and sign-up totals appear on the private dashboard only.
-- Every submitted recipe is published unless its id or code is in `hidden.txt`. There is no consent field: a
+- Every submitted recipe is published unless its id or code is in `hidden.txt`. A submission with no recipe text
+  at all is not shown. There is no consent field: a
   consent question still on a form is not read, and a `consent` key in `config.json` stops the build.
 - Report answers are read by the option texts and positions in `config.json`, never by guessing. A report whose
   contribution answer is Yes, missing or unrecognised is not counted; an unrecognised finished or overall answer

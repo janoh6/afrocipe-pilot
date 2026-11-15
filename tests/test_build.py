@@ -124,8 +124,8 @@ class AllowList(unittest.TestCase):
 
 
 class EveryRecipeIsShown(unittest.TestCase):
-    # MUTATION: skip a submission in build.build_recipes for any reason other than the hide list
-    # (e.g. add `if not sub.get("responses"): continue`, or read an answer to decide): these tests must fail.
+    # MUTATION: skip a submission in build.build_recipes because of an answer (e.g. skip when any answer is
+    # False, or when other_names is empty): these tests must fail.
     def test_every_submission_is_published_in_every_language(self):
         for consent_question in (True, False):
             w = fixturelib.World(consent_question=consent_question)
@@ -137,6 +137,18 @@ class EveryRecipeIsShown(unittest.TestCase):
             self.assertEqual({r["id"] for r in recipes_of(out)},
                              {p + l for p in ("all_", "bare_") for l in build.LANGS}, consent_question)
             self.assertIn("build ok: 6 recipes published", so)
+
+    # MUTATION: remove the "no recipe text at all" skip in build.build_recipes: the blank card is published
+    # and this test must fail. Make the skip stricter (e.g. `all` for `any`): the one-field recipe disappears.
+    def test_submission_with_no_recipe_text_is_not_shown(self):
+        w = fixturelib.World()
+        w.recipe("en", "full01")
+        w.recipe("en", "blank1", **{name: "" for name in build.TEXT_FIELDS})
+        w.recipe("en", "onefld", **dict({name: "" for name in build.TEXT_FIELDS}, dish_name="Only a name"))
+        code, so, se, out = run(w)
+        self.assertEqual(code, 0, se)
+        self.assertEqual({r["id"] for r in recipes_of(out)}, {"full01", "onefld"})
+        self.assertIn("build ok: 2 recipes published", so)
 
     def test_form_with_no_consent_question_builds(self):
         w = fixturelib.World(consent_question=False)

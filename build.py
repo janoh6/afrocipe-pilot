@@ -539,6 +539,9 @@ def build_recipes(sub_forms, cfg, hidden, counts):
             }
             for name in TEXT_FIELDS:
                 values[name] = clean_text(form.text(sub, q[name])) if name in q else ""
+            # A submission with no recipe text at all is a blank card, not a recipe: it is not shown.
+            if not any(values[name] for name in TEXT_FIELDS):
+                continue
             recipes.append({k: values[k] for k in PUBLIC_FIELDS})
     recipes.sort(key=lambda r: (r["submitted"], r["id"]), reverse=True)
     return recipes, n_hidden
