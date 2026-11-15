@@ -713,8 +713,16 @@ class Site(unittest.TestCase):
             for lang in ("en", "fr", "sw"):
                 self.assertEqual(t.count('<article lang="%s" data-lang="%s">' % (lang, lang)), 1, name)
             for href in re.findall(r'href="([^"]+)"', t):
-                self.assertRegex(href, r"^(#main|[a-z-]+\.html|assets/[\w.]+|css/style\.css|mailto:afrocipe12@gmail\.com|"
+                self.assertRegex(href, r"^(#main|[a-z-]+\.html|assets/[\w.]+|css/style\.css|"
                                        r"https://tally\.so/r/\w+)$", name)
+
+    def test_no_page_prints_or_links_an_email_address(self):
+        # The pilot's contact route is a form, so that no address on the site can be harvested.
+        for p in sorted((ROOT / "site").rglob("*")):
+            if p.suffix in (".html", ".js", ".css"):
+                t = p.read_text(encoding="utf-8")
+                self.assertNotIn("mailto:", t, p.name)
+                self.assertIsNone(re.search(r"[\w.+-]+@[\w-]+\.[a-z]{2,}", t), p.name)
 
     def test_every_page_asks_the_reader_to_take_part(self):
         import make_pages

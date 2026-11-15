@@ -29,4 +29,4 @@ Une recette reste à la personne qui l'a écrite. Les noms, les e-mails et l'his
 
 ## Contact
 
-[Contactez-nous](mailto:afrocipe12@gmail.com).
+[Contactez-nous](form:contact).

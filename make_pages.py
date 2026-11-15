@@ -4,7 +4,7 @@
 Content pages (guides, about) come from content/<page>.<lang>.md; the other four take their <main> from
 content/pages/<page>.html. A content page holds the three languages; css shows the one that matches <html lang>. The text is ours, not form
 input, and is still escaped. Markdown subset: # and ## headings, paragraphs, "1." lists, "-" lists, "- [ ]" check
-lists, | tables | (first row is the header), **bold**, [text](target). A target is a site page, mailto:, or
+lists, | tables | (first row is the header), **bold**, [text](target). A target is a site page, or
 form:<kind> for a Tally form in the page language. A line "!notice" inserts the site's standard notice, and
 "!placeholder text" a visibly unfinished box.
 
@@ -22,6 +22,7 @@ PAGES = {"guide-testers": "Guide for testers", "guide-writers": "Guide for recip
 FORMS = {
     "submit": {"en": "RWdKp4", "fr": "VpQ1VJ", "sw": "Ge9BVL"},
     "signup": {"en": "QoeBd8", "fr": "J1pkL4", "sw": "OQ4BZY"},
+    "contact": {"en": "zEyVQ0", "fr": "OQ4RBg", "sw": "4aJZNY"},
 }
 PRINTABLE = ("guide-testers", "guide-writers")
 # The buttons in a page's title band: what the reader of that page came to do.
@@ -82,7 +83,7 @@ FOOTER = """<footer class="site-footer no-print">
     </nav>
     <div>
       <p class="footer-h" data-i18n="footer_contact">Questions?</p>
-      <p><a id="contact" href="mailto:afrocipe12@gmail.com" data-i18n="contact_us">Contact us</a></p>
+      <p><a id="contact" data-form="contact" href="https://tally.so/r/zEyVQ0" data-i18n="contact_us">Contact us</a></p>
     </div>
   </div>
   <div class="wrap">
@@ -142,7 +143,7 @@ def inline(text, lang):
             if target.startswith("form:"):
                 kind = target[5:]
                 out.append('<a data-form="%s" href="https://tally.so/r/%s">%s</a>' % (kind, FORMS[kind][lang], label))
-            elif re.fullmatch(r"[a-z-]+\.html|mailto:afrocipe12@gmail\.com", target):
+            elif re.fullmatch(r"[a-z-]+\.html", target):
                 out.append('<a href="%s">%s</a>' % (target, label))
             else:
                 raise SystemExit("make_pages: link target not allowed: %s" % target)
