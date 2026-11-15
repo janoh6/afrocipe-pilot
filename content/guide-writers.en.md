@@ -42,7 +42,7 @@ Words like "cook until done" or "add enough water" are where testers get lost. W
 ## Where the recipe comes from, and your agreement
 
 - **You are the writer, and the recipe may be someone else's.** The last page of the form asks whether it was passed down or created, and by whom. Tell us what you know. "I only know part of the story" is a good answer, and a guess is not.
-- **Who can see it.** During the pilot, the recipe is on this website, which anyone can open. The form also asks who can see it after the pilot. If you are not sure, choose Controlled. We check with you before the recipe is shared any further.
+- **Who can see it.** During the pilot, the recipe is on this website, which anyone can open. After the pilot, the recipe is open by default in the Afrocipe record: anyone can see and use it. No one owns a dish, so the form does not ask you to choose.
 - **Keep personal details out of the recipe text.** Do not write your name, phone number or address in the ingredients or steps, because that text is shown on the site.
 - **You will not test your own recipe.** The testers who try it must be people who had no part in writing it. That includes anyone who taught it to you or corrected it.
 - **Your agreement** is on the first page of the form. Recipes are shared heritage: no one owns a dish, its ingredients or its basic method. What you do own is your own writing and photos, and you keep those rights. By sending a recipe, you give Afrocipe lasting permission to use them as part of the Afrocipe record, and we credit you as the contributor. You can ask us at any time to take your recipe off the pilot site or to remove your name. On the pilot site, recipes are shown without names.
