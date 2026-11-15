@@ -25,7 +25,7 @@ Le pilote est un premier essai, à petite échelle. Des personnes partagent des 
 
 !notice
 
-Une recette reste à la personne qui l'a écrite. Les noms, les e-mails et l'histoire de l'origine d'une recette ne sont pas affichés sur ce site.
+Les noms, les e-mails et l'histoire de l'origine d'une recette ne sont pas affichés sur ce site.
 
 ## Contact
 

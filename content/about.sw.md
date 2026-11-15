@@ -25,7 +25,7 @@ Majaribio haya ni jaribio la kwanza, dogo. Watu wanashiriki resipi wanazozijua v
 
 !notice
 
-Resipi inabaki kuwa ya mwandishi wake. Majina, barua pepe na hadithi ya resipi inakotoka havionyeshwi kwenye tovuti hii.
+Majina, barua pepe na hadithi ya resipi inakotoka havionyeshwi kwenye tovuti hii.
 
 ## Mawasiliano
 

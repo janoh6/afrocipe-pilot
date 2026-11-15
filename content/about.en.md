@@ -25,7 +25,7 @@ The pilot is a first, small trial. People share recipes they know well. Testers 
 
 !notice
 
-A recipe stays its writer's. Names, emails and the story of where a recipe comes from are not shown on this site.
+Names, emails and the story of where a recipe comes from are not shown on this site.
 
 ## Contact
 
