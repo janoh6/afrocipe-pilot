@@ -12,7 +12,7 @@ Afrocipe inachunguza swali rahisi: je, mtu ambaye hajawahi kupika toleo hili la 
 
 **Tunakagua kama resipi inafanya kazi, hatuhukumu upishi wako.** Chakula kikiharibika, hayo ni matokeo yenye manufaa. Yanatuonyesha kwamba resipi inahitaji kuboreshwa.
 
-**Tafadhali usirekebishe resipi kimyakimya.** Kama ulibadilisha kitu, ulikisia, au ulifanya kosa, tuambie kwenye ripoti. Ripoti inayoficha badiliko ina thamani ndogo kuliko ile inayosema chakula kiliharibika.
+**Tafadhali usirekebishe resipi kimyakimya.** Kama ulibadilisha kitu, ulikisia, au ulifanya kosa, tuambie kwenye ripoti. Tafadhali andika kila badiliko, hata dogo: linatusaidia kuelewa kilichotokea.
 
 ## Kabla ya kupika
 
@@ -21,7 +21,7 @@ Afrocipe inachunguza swali rahisi: je, mtu ambaye hajawahi kupika toleo hili la 
 - **Je, uliandika resipi hii, au ulisaidia?** Kusaidia ni pamoja na kumpa mwandishi resipi, kumfundisha, au kuirekebisha. Kama ndivyo, tafadhali usiijaribu. Chagua nyingine.
 - **Soma resipi yote mara moja** kabla ya kuanza, ili usishangazwe na jambo lolote katikati.
 - **Tumia ukurasa wa resipi tu.** Usitafute matoleo mengine wala video, na usimuulize mtu aliyeandika resipi. Kama hatua haiko wazi, fanya kile kinachoonekana kuwa na busara zaidi na utuambie kwenye ripoti.
-- **Huhitaji vifaa maalum.** Tumia jiko lako mwenyewe. Tuambie tu ulichotumia.
+- **Angalia vifaa.** Kila resipi inaonyesha vifaa inavyohitaji. Tumia jiko lako mwenyewe, na tuambie kama ulitumia kitu tofauti.
 
 ## Wakati wa kupika
 
@@ -38,7 +38,7 @@ Ukilazimika kuacha kabla ya mwisho, hakuna tatizo. Andika ulipoachia na kwa nini
 
 ## Baada ya kupika
 
-**Tuma ripoti yako kutoka kwenye ukurasa wa resipi.** Kitufe kilicho chini ya resipi kinafungua ripoti na kutuonyesha ni resipi ipi uliyopika. Ijaze siku hiyo hiyo ukiweza, wakati bado unakumbuka. Inachukua takriban dakika 10.
+**Tuma ripoti yako kutoka kwenye ukurasa wa resipi.** Kitufe cha **Ripoti jaribio langu**, chini ya skrini na mwishoni mwa resipi, kinafungua ripoti na kutuonyesha ni resipi ipi uliyopika. Umemaliza au umesimama katikati: zote mbili zinasaidia. Ijaze siku hiyo hiyo ukiweza, wakati bado unakumbuka. Inachukua takriban dakika 10.
 
 | Ripoti inauliza | Tunachomaanisha |
 | Kwa ujumla, je, ulipata chakula ambacho resipi inakieleza? | Pima kwa maelezo ya resipi, si kwa ladha yako. "Siwezi kusema" ni jibu la kweli. |

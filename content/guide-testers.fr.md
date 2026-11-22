@@ -12,7 +12,7 @@ Afrocipe explore une question simple : une personne qui n'a jamais cuisiné cett
 
 **Nous vérifions si la recette fonctionne, nous ne jugeons pas votre façon de cuisiner.** Si le plat rate, c'est un résultat utile. Cela nous dit que la recette doit être améliorée.
 
-**Ne corrigez pas la recette en silence.** Si vous avez changé quelque chose, deviné ou fait une erreur, dites-le dans le compte rendu. Un compte rendu qui cache un changement vaut moins qu'un compte rendu qui dit que le plat a raté.
+**Ne corrigez pas la recette en silence.** Si vous avez changé quelque chose, deviné ou fait une erreur, dites-le dans le compte rendu. Notez chaque changement, même petit : cela nous aide à comprendre ce qui s'est passé.
 
 ## Avant de cuisiner
 
@@ -21,7 +21,7 @@ Afrocipe explore une question simple : une personne qui n'a jamais cuisiné cett
 - **Avez-vous rédigé cette recette, ou aidé à la rédiger ?** Aider, c'est par exemple donner la recette à la personne qui l'a rédigée, la lui enseigner ou la corriger. Si oui, ne la testez pas. Choisissez-en une autre.
 - **Lisez toute la recette une fois** avant de commencer, pour ne pas avoir de surprise en cours de route.
 - **Utilisez seulement la page de la recette.** Ne cherchez pas d'autres versions ni de vidéos, et ne posez pas de questions à la personne qui a rédigé la recette. Si une étape n'est pas claire, faites ce qui vous semble le plus logique et dites-le dans le compte rendu.
-- **Vous n'avez pas besoin de matériel spécial.** Utilisez votre propre cuisine. Dites-nous simplement ce que vous avez utilisé.
+- **Vérifiez le matériel.** Chaque recette indique ce dont elle a besoin. Utilisez votre propre cuisine, et dites-nous si vous avez utilisé autre chose.
 
 ## Pendant que vous cuisinez
 
@@ -38,7 +38,7 @@ Si vous devez arrêter avant la fin, ce n'est pas grave. Notez où vous avez arr
 
 ## Après avoir cuisiné
 
-**Envoyez votre compte rendu depuis la page de la recette.** Le bouton en bas de la recette ouvre le compte rendu et nous indique quelle recette vous avez cuisinée. Remplissez-le le jour même si vous le pouvez, tant que vous vous en souvenez. Cela prend environ 10 minutes.
+**Envoyez votre compte rendu depuis la page de la recette.** Le bouton **Rendre compte de mon essai**, en bas de l'écran et à la fin de la recette, ouvre le compte rendu et nous indique quelle recette vous avez cuisinée. Terminé ou arrêté en cours de route : les deux nous sont utiles. Remplissez-le le jour même si vous le pouvez, tant que vous vous en souvenez. Cela prend environ 10 minutes.
 
 | Le compte rendu demande | Ce que nous voulons dire |
 | Dans l'ensemble, avez-vous obtenu le plat que la recette décrit ? | Jugez d'après la description de la recette, pas d'après votre goût. « Je ne peux pas le dire » est une réponse honnête. |

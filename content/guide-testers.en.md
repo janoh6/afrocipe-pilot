@@ -12,7 +12,7 @@ Afrocipe is exploring a simple question: can someone who has never cooked this v
 
 **We are checking whether the recipe works, not judging your cooking.** If the dish fails, that is a useful result. It tells us the recipe needs work.
 
-**Please do not fix the recipe quietly.** If you changed something, guessed, or made a mistake, tell us in the report. A report that hides a change is worth less than one that says the dish went wrong.
+**Please do not fix the recipe quietly.** If you changed something, guessed, or made a mistake, tell us in the report. Please record every change, even a small one: it helps us understand what happened.
 
 ## Before you cook
 
@@ -21,7 +21,7 @@ Afrocipe is exploring a simple question: can someone who has never cooked this v
 - **Did you write this recipe, or help with it?** Helping includes giving the recipe to the writer, teaching it to them, or correcting it. If so, please do not test it. Choose another one.
 - **Read the whole recipe once** before you start, so nothing surprises you halfway.
 - **Use only the recipe page.** Do not look up other versions or videos, and do not ask the person who wrote it. If a step is unclear, do what seems most sensible and tell us in the report.
-- **You do not need special equipment.** Use your own kitchen. Just tell us what you used.
+- **Check the equipment.** Each recipe lists what it needs. Use your own kitchen, and tell us if you used something different.
 
 ## While you cook
 
@@ -38,7 +38,7 @@ If you have to stop before the end, that is fine. Note where you stopped and why
 
 ## After you cook
 
-**Send your report from the recipe page.** The button at the bottom of the recipe opens the report and tells us which recipe you cooked. Fill it in the same day if you can, while you still remember. It takes about 10 minutes.
+**Send your report from the recipe page.** The **Report my attempt** button, at the bottom of the screen and at the end of the recipe, opens the report and tells us which recipe you cooked. Finished or stopped early: both are useful. Fill it in the same day if you can, while you still remember. It takes about 10 minutes.
 
 | The report asks | What we mean |
 | Overall, did you make the dish the recipe describes? | Judge against the recipe's description, not your own taste. "I cannot tell" is an honest answer. |

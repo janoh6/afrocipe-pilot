@@ -20,6 +20,28 @@
     h.textContent = r.dish_name || r.code;
     a.appendChild(h);
     li.appendChild(a);
+    /* What someone needs to choose a dish: time, quantity, equipment. The writer's words, first line only for
+       time and quantity, every equipment line joined. */
+    var facts = document.createElement("dl");
+    facts.className = "card-facts";
+    [["f_time", r.total_time, false], ["f_makes", r.makes, false], ["f_equipment", r.equipment, true]].forEach(function (p) {
+      var ls = String(p[1] || "").split("\n").map(function (l) { return l.trim(); }).filter(function (l) { return l.length > 0; });
+      if (!ls.length) return;
+      var row = document.createElement("div");
+      var dt = document.createElement("dt");
+      dt.textContent = t(lang, p[0]);
+      var dd = document.createElement("dd");
+      dd.textContent = p[2] ? ls.join(" · ") : ls[0];
+      if (p[2]) dd.className = "clamp";
+      row.appendChild(dt);
+      row.appendChild(dd);
+      facts.appendChild(row);
+    });
+    if (facts.childNodes.length) li.appendChild(facts);
+    var c = document.createElement("p");
+    c.className = "count";
+    c.textContent = counts(r.tests || 0);
+    li.appendChild(c);
     var meta = document.createElement("p");
     meta.className = "meta";
     var code = document.createElement("span");
@@ -32,10 +54,6 @@
     meta.appendChild(code);
     meta.appendChild(tag);
     li.appendChild(meta);
-    var c = document.createElement("p");
-    c.className = "count";
-    c.textContent = counts(r.tests || 0);
-    li.appendChild(c);
     return li;
   }
 

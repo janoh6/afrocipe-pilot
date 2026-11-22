@@ -26,6 +26,30 @@ for (const width of [360, 800, 1280, 1920]) {
       await page.goto(`${base}/${p}${p.includes("?") ? "&" : "?"}lang=${lang}`, { waitUntil: "networkidle" });
       if (p === "recipes.html" && (await page.locator(".card").count()) === 0) problems.push(`${tag}: no recipe cards`);
       if (p.startsWith("recipe.html") && (await page.locator("h1").innerText()).trim() === "") problems.push(`${tag}: empty heading`);
+      if (p === "recipes.html" && (await page.locator(".card .card-facts").count()) === 0) problems.push(`${tag}: cards show no time, quantity or equipment`);
+      if (p === "recipes.html" && !(await page.locator(".first-time a").getAttribute("href")).startsWith("https://tally.so/r/")) problems.push(`${tag}: no join link on the list`);
+      if (p.startsWith("recipe.html")) {
+        // The tester's path at the top: join, then the report link lands on the report box.
+        const join = page.locator(".journey li:first-child a");
+        if ((await join.count()) !== 1 || !(await join.getAttribute("href")).startsWith("https://tally.so/r/")) problems.push(`${tag}: journey has no join link`);
+        if ((await page.locator(".journey a[href='#report']").count()) !== 1 || (await page.locator("#report").count()) !== 1) problems.push(`${tag}: journey does not lead to the report`);
+        // The bar: a report link with the recipe filled in, visible at the top of the page.
+        const bar = page.locator(".cook-bar > a.btn");
+        if ((await bar.count()) !== 1 || !(await bar.isVisible()) || !(await bar.getAttribute("href")).includes("recipe=Jo11of")) problems.push(`${tag}: no report button in view`);
+        // The signs open over the page, without scrolling, and close again.
+        const y = await page.evaluate(() => window.scrollY);
+        if ((await page.locator(".cook-bar > button").count()) !== 1) { problems.push(`${tag}: no signs button`); } else {
+        await page.click(".cook-bar > button");
+        if (!(await page.locator("#signs-panel").isVisible()) || (await page.evaluate(() => window.scrollY)) !== y) problems.push(`${tag}: signs panel does not open in place`);
+        const inView = await page.evaluate(() => { const r = document.querySelector("#signs-panel").getBoundingClientRect(); return r.top >= 0 && r.bottom <= window.innerHeight; });
+        if (!inView) problems.push(`${tag}: signs panel runs off the screen`);
+        await page.keyboard.press("Escape");
+        if (await page.locator("#signs-panel").isVisible()) problems.push(`${tag}: Escape does not close the signs panel`);
+        }
+        // The ingredient panel scrolls with the page: no scrollbar of its own.
+        const own = await page.evaluate(() => { const e = document.querySelector(".block-ingredients"); return getComputedStyle(e).overflowY; });
+        if (own === "auto" || own === "scroll") problems.push(`${tag}: ingredients have their own scrollbar`);
+      }
       if (p === "dashboard.html") {
         await page.fill("#pass", PASS);
         await page.click("button[type=submit]");

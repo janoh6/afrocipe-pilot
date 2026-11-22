@@ -142,16 +142,78 @@
     return art;
   }
 
+  function reportUrl(r) {
+    return SITE.formUrl("report", lang) + "?recipe=" + encodeURIComponent(r.id) +
+      "&dish=" + encodeURIComponent(r.dish_name || "") + "&version=v1";
+  }
+  function link(cls, text, href) {
+    var a = el("a", cls, text);
+    a.href = href;
+    return a;
+  }
+  /* The tester's path, at the top of the recipe: someone who arrives from the list may not have read the guide. */
+  function journey() {
+    var ol = el("ol", "journey no-print");
+    ol.setAttribute("aria-label", t(lang, "j_label"));
+    [link(null, t(lang, "j_join"), SITE.formUrl("signup", lang)), t(lang, "j_read"), t(lang, "j_cook"),
+      link(null, t(lang, "j_report"), "#report")].forEach(function (x) {
+      var li = el("li");
+      if (typeof x === "string") li.textContent = x; else li.appendChild(x);
+      ol.appendChild(li);
+    });
+    return ol;
+  }
   function report(r) {
     var box = el("div", "report no-print");
+    box.id = "report";
     box.appendChild(el("p", "reminder", t(lang, "reminders")));
-    var a = el("a", "btn btn-big", t(lang, "btn_report"));
-    a.href = SITE.formUrl("report", lang) + "?recipe=" + encodeURIComponent(r.id) +
-      "&dish=" + encodeURIComponent(r.dish_name || "") + "&version=v1";
+    box.appendChild(el("p", null, t(lang, "report_both")));
+    var a = link("btn btn-big", t(lang, "btn_report"), reportUrl(r));
     a.id = "report-link";
     box.appendChild(a);
     box.appendChild(el("p", "fine", t(lang, "not_author")));
     return box;
+  }
+  /* A small bar that stays at the bottom of the window: the signs for each stage open over the page, so a cook
+     does not lose their place in the method, and the report is one tap away whether or not they finished. */
+  function cookBar(r, signsNodes, reportBox) {
+    var bar = el("div", "cook-bar no-print");
+    if (signsNodes.length) {
+      var panel = el("div", "signs-panel");
+      panel.id = "signs-panel";
+      panel.hidden = true;
+      panel.lang = r.lang;
+      panel.setAttribute("role", "region");
+      panel.setAttribute("aria-label", t(lang, "f_signs"));
+      var head = el("div", "signs-panel-head");
+      head.appendChild(el("h2", null, t(lang, "f_signs")));
+      var close = el("button", "btn-quiet", t(lang, "signs_close"));
+      close.type = "button";
+      head.appendChild(close);
+      panel.appendChild(head);
+      signsNodes.forEach(function (n) { panel.appendChild(n); });
+      var open = el("button", "btn-quiet", t(lang, "signs_open"));
+      open.type = "button";
+      open.setAttribute("aria-controls", "signs-panel");
+      open.setAttribute("aria-expanded", "false");
+      var show = function (on) {
+        panel.hidden = !on;
+        open.setAttribute("aria-expanded", on ? "true" : "false");
+        if (on) close.focus(); else open.focus();
+      };
+      open.addEventListener("click", function () { show(panel.hidden); });
+      close.addEventListener("click", function () { show(false); });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !panel.hidden) show(false); });
+      bar.appendChild(panel);
+      bar.appendChild(open);
+    }
+    bar.appendChild(link("btn", t(lang, "btn_report"), reportUrl(r)));
+    /* Out of the way while the report box itself is on screen. */
+    if ("IntersectionObserver" in window) new IntersectionObserver(function (es) {
+      bar.classList.toggle("cook-bar-off", es[0].isIntersecting);
+    }).observe(reportBox);
+    document.body.classList.add("has-cook-bar");
+    return bar;
   }
 
   fetch("data/recipes.json", { cache: "no-cache" })
@@ -160,9 +222,13 @@
       var r = (Array.isArray(list) ? list : []).filter(function (x) { return x.id === id; })[0];
       if (!r) { status.textContent = t(lang, "not_found"); return; }
       status.textContent = "";
+      root.appendChild(journey());
       root.appendChild(tools());
       root.appendChild(render(r));
-      root.appendChild(report(r));
+      var box = report(r);
+      root.appendChild(box);
+      var signs = lines(r.signs);
+      document.body.appendChild(cookBar(r, signs.length ? grouped(signs, "plain") : [], box));
     })
     .catch(function () { status.textContent = t(lang, "load_error"); });
 })();
